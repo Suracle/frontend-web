@@ -1,0 +1,39 @@
+# Node modules
+node_modules/
+
+# Vite build output
+dist/
+
+# Environment variables
+.env
+.env.*.local
+
+# System files
+.DS_Store
+Thumbs.db
+
+# IDE settings
+.vscode/
+.idea/
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+
+# Logs
+npm-debug.log*
+pnpm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# TypeScript cache
+*.tsbuildinfo
+
+# Optional: local development output
+*.local
+
+# ShadCN - ignore generated types (if using next-intl or similar tools)
+*.generated.ts
+
+# MacOS or Linux hidden files
+*.swp
