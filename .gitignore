@@ -1,39 +1,80 @@
-# Node modules
+# ================================
+# 📦 Node Modules
+# ================================
 node_modules/
 
-# Vite build output
+# ================================
+# 🛠️ Vite Build Output
+# ================================
 dist/
 
-# Environment variables
+# ================================
+# ⚙️ Environment Variables
+# ================================
 .env
 .env.*.local
 
-# System files
+# ================================
+# 🧪 Test & Coverage
+# ================================
+coverage/
+*.lcov
+
+# ================================
+# 🗂️ System Files
+# ================================
 .DS_Store
 Thumbs.db
+*.swp
+*.swo
+*.tmp
 
-# IDE settings
+# ================================
+# 🧠 IDE / Editor Settings
+# ================================
 .vscode/
 .idea/
 *.suo
 *.ntvs*
 *.njsproj
 *.sln
+*.code-workspace
 
-# Logs
+# ================================
+# 📜 Logs
+# ================================
 npm-debug.log*
 pnpm-debug.log*
 yarn-debug.log*
 yarn-error.log*
 
-# TypeScript cache
+# ================================
+# ⚡ TypeScript
+# ================================
 *.tsbuildinfo
+*.d.ts.map
 
-# Optional: local development output
+# ================================
+# 🧩 Optional / Local Dev
+# ================================
 *.local
 
-# ShadCN - ignore generated types (if using next-intl or similar tools)
+# ================================
+# ✨ ShadCN
+# ================================
 *.generated.ts
 
-# MacOS or Linux hidden files
-*.swp
+# ================================
+# 📸 Playwright / Cypress (Optional)
+# ================================
+.playwright/
+cypress/videos/
+cypress/screenshots/
+
+# ================================
+# 🔒 Security / SSL / Certs
+# ================================
+*.pem
+*.key
+*.crt
+*.jks
