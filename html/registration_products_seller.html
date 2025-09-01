@@ -1,0 +1,879 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>K-Bridge E-commerce - 상품 등록</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary: #D94F4F;
+            --secondary: #E99BAE;
+            --accent-cream: #F3E6D8;
+            --white: #ffffff;
+            --text-primary: #2c2c2c;
+            --text-secondary: #666666;
+            --light-gray: #f8f9fa;
+            --border: #e0e0e0;
+            --shadow: rgba(217, 79, 79, 0.15);
+            --success: #4CAF50;
+            --warning: #ff9800;
+            --info: #2196f3;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: var(--light-gray);
+        }
+
+        /* Header */
+        .header {
+            background: var(--white);
+            box-shadow: 0 2px 10px var(--shadow);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .header-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            height: 70px;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 20px;
+            font-weight: 700;
+            color: var(--primary);
+        }
+
+        .logo i {
+            font-size: 24px;
+        }
+
+        .nav-breadcrumb {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            color: var(--text-secondary);
+            font-size: 14px;
+        }
+
+        .nav-breadcrumb a {
+            color: var(--primary);
+            text-decoration: none;
+            transition: color 0.3s ease;
+        }
+
+        .nav-breadcrumb a:hover {
+            color: var(--secondary);
+        }
+
+        .user-info {
+            display: flex;
+            align-items: center;
+            justify-content: flex-end;
+            gap: 15px;
+        }
+
+        .user-badge {
+            background: var(--accent-cream);
+            color: var(--primary);
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 14px;
+            font-weight: 500;
+        }
+
+        /* Main Content */
+        .main-container {
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 30px 20px;
+        }
+
+        .page-header {
+            margin-bottom: 30px;
+        }
+
+        .page-title {
+            font-size: 28px;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 8px;
+        }
+
+        .page-subtitle {
+            color: var(--text-secondary);
+            font-size: 16px;
+        }
+
+        /* Registration Form */
+        .registration-form {
+            background: var(--white);
+            border-radius: 16px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+            overflow: hidden;
+        }
+
+        .form-header {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+            color: var(--white);
+            padding: 24px 30px;
+        }
+
+        .form-header h2 {
+            font-size: 20px;
+            font-weight: 600;
+            margin-bottom: 4px;
+        }
+
+        .form-header p {
+            opacity: 0.9;
+            font-size: 14px;
+        }
+
+        .form-body {
+            padding: 30px;
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 24px;
+            margin-bottom: 24px;
+        }
+
+        .form-group {
+            margin-bottom: 24px;
+        }
+
+        .form-group.full-width {
+            grid-column: 1 / -1;
+        }
+
+        .form-label {
+            display: block;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 8px;
+            font-size: 14px;
+        }
+
+        .form-label.required::after {
+            content: '*';
+            color: var(--primary);
+            margin-left: 4px;
+        }
+
+        .form-input {
+            width: 100%;
+            padding: 12px 16px;
+            border: 2px solid var(--border);
+            border-radius: 10px;
+            font-size: 16px;
+            transition: all 0.3s ease;
+            background: var(--white);
+        }
+
+        .form-input:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(217, 79, 79, 0.1);
+        }
+
+        .form-input::placeholder {
+            color: #999;
+        }
+
+        .form-textarea {
+            min-height: 120px;
+            resize: vertical;
+            font-family: inherit;
+        }
+
+        /* HS Code Section */
+        .hs-code-section {
+            position: relative;
+        }
+
+        .hs-code-input-group {
+            display: flex;
+            gap: 12px;
+        }
+
+        .hs-code-input {
+            flex: 1;
+        }
+
+        .hs-code-btn {
+            background: var(--info);
+            color: var(--white);
+            border: none;
+            padding: 12px 20px;
+            border-radius: 10px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            white-space: nowrap;
+        }
+
+        .hs-code-btn:hover {
+            background: #1976d2;
+            transform: translateY(-1px);
+        }
+
+        .hs-code-btn:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        /* HS Code Recommendations */
+        .hs-recommendations {
+            position: absolute;
+            top: 100%;
+            left: 0;
+            right: 0;
+            background: var(--white);
+            border: 2px solid var(--border);
+            border-radius: 10px;
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+            z-index: 10;
+            display: none;
+            margin-top: 4px;
+            max-height: 300px;
+            overflow-y: auto;
+        }
+
+        .hs-recommendations.show {
+            display: block;
+        }
+
+        .hs-recommendation-item {
+            padding: 16px 20px;
+            border-bottom: 1px solid var(--border);
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        .hs-recommendation-item:last-child {
+            border-bottom: none;
+        }
+
+        .hs-recommendation-item:hover {
+            background: var(--accent-cream);
+        }
+
+        .hs-recommendation-item.selected {
+            background: var(--accent-cream);
+            border-left: 4px solid var(--primary);
+        }
+
+        .hs-code-title {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 8px;
+        }
+
+        .hs-code-number {
+            font-weight: 700;
+            color: var(--primary);
+            font-size: 16px;
+        }
+
+        .confidence-badge {
+            background: var(--success);
+            color: var(--white);
+            padding: 4px 8px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .confidence-badge.medium {
+            background: var(--warning);
+        }
+
+        .confidence-badge.low {
+            background: #9e9e9e;
+        }
+
+        .hs-description {
+            color: var(--text-secondary);
+            font-size: 14px;
+            line-height: 1.4;
+            margin-bottom: 8px;
+        }
+
+        .reference-link {
+            color: var(--info);
+            text-decoration: none;
+            font-size: 12px;
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            transition: color 0.3s ease;
+        }
+
+        .reference-link:hover {
+            color: #1976d2;
+            text-decoration: underline;
+        }
+
+        /* Form Actions */
+        .form-actions {
+            display: flex;
+            gap: 16px;
+            justify-content: flex-end;
+            padding-top: 24px;
+            border-top: 1px solid var(--border);
+        }
+
+        .btn {
+            padding: 14px 28px;
+            border: none;
+            border-radius: 10px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-secondary {
+            background: var(--border);
+            color: var(--text-primary);
+        }
+
+        .btn-secondary:hover {
+            background: #d0d0d0;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+            color: var(--white);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px var(--shadow);
+        }
+
+        .btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+
+        /* Chatbot */
+        .chatbot-container {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            z-index: 1000;
+        }
+
+        .chatbot-toggle {
+            width: 60px;
+            height: 60px;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+            border: none;
+            border-radius: 50%;
+            color: var(--white);
+            font-size: 24px;
+            cursor: pointer;
+            box-shadow: 0 4px 20px var(--shadow);
+            transition: all 0.3s ease;
+        }
+
+        .chatbot-toggle:hover {
+            transform: scale(1.1);
+        }
+
+        .chatbot-window {
+            position: absolute;
+            bottom: 70px;
+            right: 0;
+            width: 400px;
+            height: 600px;
+            background: var(--white);
+            border-radius: 16px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+            display: none;
+            flex-direction: column;
+        }
+
+        .chatbot-window.open {
+            display: flex;
+        }
+
+        .chatbot-header {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+            color: var(--white);
+            padding: 16px 20px;
+            border-radius: 16px 16px 0 0;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .chatbot-header i {
+            font-size: 20px;
+        }
+
+        .chatbot-title {
+            font-weight: 600;
+            font-size: 16px;
+        }
+
+        .chatbot-messages {
+            flex: 1;
+            padding: 20px;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        .chatbot-input {
+            padding: 16px 20px;
+            border-top: 1px solid var(--border);
+            display: flex;
+            gap: 12px;
+        }
+
+        .chatbot-input input {
+            flex: 1;
+            padding: 10px 12px;
+            border: 2px solid var(--border);
+            border-radius: 20px;
+            font-size: 14px;
+            transition: border-color 0.3s ease;
+        }
+
+        .chatbot-input input:focus {
+            outline: none;
+            border-color: var(--primary);
+        }
+
+        .send-btn {
+            width: 36px;
+            height: 36px;
+            background: var(--primary);
+            color: var(--white);
+            border: none;
+            border-radius: 50%;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+        }
+
+        .send-btn:hover {
+            background: var(--secondary);
+        }
+
+        /* Loading State */
+        .loading {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            color: var(--text-secondary);
+            font-size: 14px;
+        }
+
+        .spinner {
+            width: 16px;
+            height: 16px;
+            border: 2px solid transparent;
+            border-top: 2px solid var(--primary);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .header-container {
+                padding: 0 15px;
+            }
+
+            .main-container {
+                padding: 20px 15px;
+            }
+
+            .form-grid {
+                grid-template-columns: 1fr;
+                gap: 16px;
+            }
+
+            .form-body {
+                padding: 20px;
+            }
+
+            .form-actions {
+                flex-direction: column-reverse;
+            }
+
+            .btn {
+                width: 100%;
+                justify-content: center;
+            }
+
+            .chatbot-window {
+                width: calc(100vw - 40px);
+                height: 500px;
+            }
+
+            .page-title {
+                font-size: 24px;
+            }
+
+            .hs-code-input-group {
+                flex-direction: column;
+            }
+
+            .hs-code-btn {
+                width: 100%;
+            }
+        }
+
+        /* Success Message */
+        .success-message {
+            background: var(--success);
+            color: var(--white);
+            padding: 16px 20px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            display: none;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .success-message.show {
+            display: flex;
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <header class="header">
+        <div class="header-container">
+            <div class="logo">
+                <i class="fas fa-bridge"></i>
+                K-브릿지 이커머스
+            </div>
+            <nav class="nav-breadcrumb">
+                <a href="#dashboard">대시보드</a>
+                <i class="fas fa-chevron-right"></i>
+                <span>상품 등록</span>
+            </nav>
+            <div class="user-info">
+                <div class="user-badge">
+                    <i class="fas fa-store"></i>
+                    한국 판매자
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="main-container">
+        <div class="page-header">
+            <h1 class="page-title">새 상품 등록</h1>
+            <p class="page-subtitle">미국 시장 진출을 위한 상품 정보를 입력해주세요. AI가 HS코드와 관세 정보를 자동으로 분석해드립니다.</p>
+        </div>
+
+        <div class="success-message" id="successMessage">
+            <i class="fas fa-check-circle"></i>
+            <span>상품이 성공적으로 등록되었습니다!</span>
+        </div>
+
+        <form class="registration-form" id="productForm">
+            <div class="form-header">
+                <h2><i class="fas fa-plus-circle"></i> 상품 정보 입력</h2>
+                <p>정확한 정보를 입력하시면 더 정확한 관세 분석을 받으실 수 있습니다.</p>
+            </div>
+
+            <div class="form-body">
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label class="form-label required" for="productName">상품명</label>
+                        <input type="text" id="productName" class="form-input" placeholder="예: 프리미엄 한국 인삼 엑기스" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label required" for="productPrice">상품 가격 (USD)</label>
+                        <input type="number" id="productPrice" class="form-input" placeholder="99.99" step="0.01" min="0" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label required" for="fobPrice">FOB 가격 (USD)</label>
+                        <input type="number" id="fobPrice" class="form-input" placeholder="120.00" step="0.01" min="0" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label required" for="origin">원산지</label>
+                        <input type="text" id="origin" class="form-input" placeholder="대한민국" required>
+                    </div>
+                </div>
+
+                <div class="form-group full-width">
+                    <label class="form-label required" for="productDescription">상품 설명</label>
+                    <textarea id="productDescription" class="form-input form-textarea" placeholder="상품의 특징, 용도, 성분 등을 상세히 입력해주세요. 정확한 HS코드 분류를 위해 가능한 상세하게 작성해주세요." required></textarea>
+                </div>
+
+                <div class="form-group full-width hs-code-section">
+                    <label class="form-label" for="hsCode">HS코드</label>
+                    <div class="hs-code-input-group">
+                        <input type="text" id="hsCode" class="form-input hs-code-input" placeholder="AI가 추천하는 HS코드를 선택하거나 직접 입력하세요" readonly>
+                        <button type="button" class="hs-code-btn" id="hsCodeBtn" onclick="requestHSCode()">
+                            <i class="fas fa-magic"></i>
+                            HS코드 확인
+                        </button>
+                    </div>
+
+                    <div class="hs-recommendations" id="hsRecommendations">
+                        <!-- HS Code recommendations will be populated here -->
+                    </div>
+                </div>
+
+                <div class="form-actions">
+                    <button type="button" class="btn btn-secondary" onclick="goBack()">
+                        <i class="fas fa-arrow-left"></i>
+                        취소
+                    </button>
+                    <button type="submit" class="btn btn-primary" id="registerBtn">
+                        <i class="fas fa-save"></i>
+                        상품 등록
+                    </button>
+                </div>
+            </div>
+        </form>
+    </main>
+
+    <!-- Chatbot -->
+    <div class="chatbot-container">
+        <button class="chatbot-toggle" onclick="toggleChatbot()">
+            <i class="fas fa-comments"></i>
+        </button>
+        <div class="chatbot-window" id="chatbotWindow">
+            <div class="chatbot-header">
+                <i class="fas fa-robot"></i>
+                <div class="chatbot-title">AI 무역 어시스턴트</div>
+            </div>
+            <div class="chatbot-messages" id="chatbotMessages">
+                <div style="padding: 20px; text-align: center; color: var(--text-secondary);">
+                    <i class="fas fa-comments" style="font-size: 48px; margin-bottom: 16px; opacity: 0.3;"></i>
+                    <p>AI 어시스턴트가 상품 등록을 도와드립니다.<br>궁금한 점이 있으시면 언제든 문의하세요!</p>
+                </div>
+            </div>
+            <div class="chatbot-input">
+                <input type="text" placeholder="메시지를 입력하세요..." onkeypress="handleChatKeypress(event)">
+                <button class="send-btn" onclick="sendMessage()">
+                    <i class="fas fa-paper-plane"></i>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Mock HS Code recommendations data
+        const mockHSRecommendations = [
+            {
+                code: '1211.20.10',
+                description: '인삼 및 그 제품 (건조, 분쇄 또는 분말 상태)',
+                confidence: 95,
+                referenceUrl: 'https://www.customs.go.kr/kcs/tariff/classification.do'
+            },
+            {
+                code: '2106.90.90',
+                description: '기타 조제 식료품 (인삼 엑기스 포함)',
+                confidence: 85,
+                referenceUrl: 'https://www.customs.go.kr/kcs/tariff/classification.do'
+            },
+            {
+                code: '3003.90.90',
+                description: '기타 의약품 (천연 추출물)',
+                confidence: 70,
+                referenceUrl: 'https://www.customs.go.kr/kcs/tariff/classification.do'
+            }
+        ];
+
+        let selectedHSCode = null;
+
+        // HS Code request function
+        function requestHSCode() {
+            const productName = document.getElementById('productName').value;
+            const productDescription = document.getElementById('productDescription').value;
+            const hsCodeBtn = document.getElementById('hsCodeBtn');
+            const recommendations = document.getElementById('hsRecommendations');
+
+            if (!productName || !productDescription) {
+                alert('상품명과 상품 설명을 먼저 입력해주세요.');
+                return;
+            }
+
+            // Show loading state
+            hsCodeBtn.disabled = true;
+            hsCodeBtn.innerHTML = '<div class="spinner"></div> 분석 중...';
+
+            // Simulate AI processing
+            setTimeout(() => {
+                showHSRecommendations();
+                hsCodeBtn.disabled = false;
+                hsCodeBtn.innerHTML = '<i class="fas fa-magic"></i> HS코드 확인';
+            }, 2000);
+        }
+
+        // Show HS Code recommendations
+        function showHSRecommendations() {
+            const recommendations = document.getElementById('hsRecommendations');
+            
+            recommendations.innerHTML = mockHSRecommendations.map(item => `
+                <div class="hs-recommendation-item" onclick="selectHSCode('${item.code}', '${item.description}')">
+                    <div class="hs-code-title">
+                        <div class="hs-code-number">${item.code}</div>
+                        <div class="confidence-badge ${item.confidence >= 90 ? '' : item.confidence >= 80 ? 'medium' : 'low'}">
+                            ${item.confidence}% 적합
+                        </div>
+                    </div>
+                    <div class="hs-description">${item.description}</div>
+                    <a href="${item.referenceUrl}" class="reference-link" target="_blank" onclick="event.stopPropagation()">
+                        <i class="fas fa-external-link-alt"></i>
+                        관련 자료 보기
+                    </a>
+                </div>
+            `).join('');
+
+            recommendations.classList.add('show');
+        }
+
+        // Select HS Code
+        function selectHSCode(code, description) {
+            selectedHSCode = { code, description };
+            document.getElementById('hsCode').value = code;
+            
+            // Update selected state
+            document.querySelectorAll('.hs-recommendation-item').forEach(item => {
+                item.classList.remove('selected');
+            });
+            event.currentTarget.classList.add('selected');
+            
+            // Hide recommendations after selection
+            setTimeout(() => {
+                document.getElementById('hsRecommendations').classList.remove('show');
+            }, 500);
+        }
+
+        // Form submission
+        document.getElementById('productForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const formData = {
+                productName: document.getElementById('productName').value,
+                productPrice: document.getElementById('productPrice').value,
+                fobPrice: document.getElementById('fobPrice').value,
+                origin: document.getElementById('origin').value,
+                productDescription: document.getElementById('productDescription').value,
+                hsCode: selectedHSCode
+            };
+
+            if (!formData.productName || !formData.productPrice || !formData.fobPrice || !formData.origin || !formData.productDescription) {
+                alert('모든 필수 항목을 입력해주세요.');
+                return;
+            }
+
+            // Show loading state
+            const registerBtn = document.getElementById('registerBtn');
+            registerBtn.disabled = true;
+            registerBtn.innerHTML = '<div class="spinner"></div> 등록 중...';
+
+            // Simulate registration process
+            setTimeout(() => {
+                // Generate product ID
+                const productId = 'PRD' + String(Math.floor(Math.random() * 1000)).padStart(3, '0');
+                
+                // Show success message
+                document.getElementById('successMessage').classList.add('show');
+                
+                // Reset button
+                registerBtn.disabled = false;
+                registerBtn.innerHTML = '<i class="fas fa-save"></i> 상품 등록';
+                
+                // Simulate redirect to product detail page
+                setTimeout(() => {
+                    alert(`상품이 성공적으로 등록되었습니다!\n\n상품 ID: ${productId}\n상품명: ${formData.productName}\n\n상품 상세관리 페이지로 이동합니다.`);
+                    // In real implementation, redirect to product detail page
+                    // window.location.href = `/products/${productId}`;
+                }, 1000);
+                
+            }, 2000);
+        });
+
+        // Go back function
+        function goBack() {
+            if (confirm('입력한 내용이 저장되지 않습니다. 정말 취소하시겠습니까?')) {
+                // In real implementation, go back to previous page
+                history.back();
+            }
+        }
+
+        // Chatbot functions
+        function toggleChatbot() {
+            const chatbotWindow = document.getElementById('chatbotWindow');
+            chatbotWindow.classList.toggle('open');
+        }
+
+        function handleChatKeypress(event) {
+            if (event.key === 'Enter') {
+                sendMessage();
+            }
+        }
+
+        function sendMessage() {
+            // Chatbot logic would be implemented here
+            console.log('Send message clicked');
+        }
+
+        // Close recommendations when clicking outside
+        document.addEventListener('click', function(e) {
+            const hsSection = document.querySelector('.hs-code-section');
+            const recommendations = document.getElementById('hsRecommendations');
+            
+            if (!hsSection.contains(e.target)) {
+                recommendations.classList.remove('show');
+            }
+        });
+
+        // Auto-resize textarea
+        document.getElementById('productDescription').addEventListener('input', function() {
+            this.style.height = 'auto';
+            this.style.height = this.scrollHeight + 'px';
+        });
+    </script>
+</body>
+</html>

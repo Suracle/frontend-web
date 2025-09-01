@@ -1,0 +1,756 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>K-Bridge E-commerce - Product Catalog</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary: #D94F4F;
+            --secondary: #E99BAE;
+            --accent-cream: #F3E6D8;
+            --white: #ffffff;
+            --text-primary: #2c2c2c;
+            --text-secondary: #666666;
+            --light-gray: #f8f9fa;
+            --border: #e0e0e0;
+            --shadow: rgba(217, 79, 79, 0.15);
+            --success: #4CAF50;
+            --warning: #ff9800;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: var(--light-gray);
+        }
+
+        /* Header */
+        .header {
+            background: var(--white);
+            box-shadow: 0 2px 10px var(--shadow);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .header-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            height: 70px;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 20px;
+            font-weight: 700;
+            color: var(--primary);
+        }
+
+        .logo i {
+            font-size: 24px;
+        }
+
+        .user-info {
+            display: flex;
+            align-items: center;
+            justify-content: flex-end;
+            gap: 15px;
+        }
+
+        .user-badge {
+            background: var(--accent-cream);
+            color: var(--primary);
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 14px;
+            font-weight: 500;
+        }
+
+        .language-toggle {
+            background: var(--white);
+            border: 2px solid var(--secondary);
+            border-radius: 20px;
+            padding: 6px 12px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 14px;
+            color: var(--primary);
+            transition: all 0.3s ease;
+        }
+
+        .language-toggle:hover {
+            background: var(--secondary);
+            color: var(--white);
+        }
+
+        /* Main Content */
+        .main-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 30px 20px;
+        }
+
+        .page-title {
+            font-size: 28px;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 10px;
+        }
+
+        .page-subtitle {
+            color: var(--text-secondary);
+            margin-bottom: 30px;
+        }
+
+        /* Product Grid */
+        .products-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 24px;
+            margin-bottom: 50px;
+        }
+
+        .product-card {
+            background: var(--white);
+            border-radius: 16px;
+            overflow: hidden;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+            transition: all 0.3s ease;
+        }
+
+        .product-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.12);
+        }
+
+        .product-image {
+            width: 100%;
+            height: 200px;
+            background: linear-gradient(135deg, var(--accent-cream) 0%, var(--secondary) 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+        }
+
+        .product-image i {
+            font-size: 48px;
+            color: var(--white);
+            opacity: 0.7;
+        }
+
+        .product-origin {
+            position: absolute;
+            top: 12px;
+            left: 12px;
+            background: rgba(255, 255, 255, 0.9);
+            color: var(--primary);
+            padding: 4px 8px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .product-info {
+            padding: 20px;
+        }
+
+        .product-name {
+            font-size: 18px;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 8px;
+            line-height: 1.3;
+        }
+
+        .product-description {
+            color: var(--text-secondary);
+            font-size: 14px;
+            line-height: 1.4;
+            margin-bottom: 16px;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+
+        .product-price {
+            font-size: 24px;
+            font-weight: 700;
+            color: var(--primary);
+            margin-bottom: 16px;
+        }
+
+        .product-fob {
+            font-size: 14px;
+            color: var(--text-secondary);
+            margin-bottom: 16px;
+        }
+
+        .quantity-section {
+            margin-bottom: 16px;
+        }
+
+        .quantity-label {
+            font-size: 14px;
+            font-weight: 500;
+            color: var(--text-primary);
+            margin-bottom: 8px;
+        }
+
+        .quantity-input-group {
+            display: flex;
+            gap: 8px;
+        }
+
+        .quantity-input {
+            flex: 1;
+            padding: 10px 12px;
+            border: 2px solid var(--border);
+            border-radius: 8px;
+            font-size: 16px;
+            transition: border-color 0.3s ease;
+        }
+
+        .quantity-input:focus {
+            outline: none;
+            border-color: var(--primary);
+        }
+
+        .calculate-btn {
+            padding: 10px 16px;
+            background: var(--primary);
+            color: var(--white);
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+
+        .calculate-btn:hover {
+            background: var(--secondary);
+        }
+
+        .tariff-info {
+            background: var(--accent-cream);
+            padding: 12px;
+            border-radius: 8px;
+            margin-top: 12px;
+            display: none;
+        }
+
+        .tariff-info.show {
+            display: block;
+        }
+
+        .tariff-amount {
+            font-size: 16px;
+            font-weight: 600;
+            color: var(--primary);
+            margin-bottom: 4px;
+        }
+
+        .tariff-details {
+            font-size: 12px;
+            color: var(--text-secondary);
+        }
+
+        /* Chatbot */
+        .chatbot-container {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            z-index: 1000;
+        }
+
+        .chatbot-toggle {
+            width: 60px;
+            height: 60px;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+            border: none;
+            border-radius: 50%;
+            color: var(--white);
+            font-size: 24px;
+            cursor: pointer;
+            box-shadow: 0 4px 20px var(--shadow);
+            transition: all 0.3s ease;
+        }
+
+        .chatbot-toggle:hover {
+            transform: scale(1.1);
+        }
+
+        .chatbot-window {
+            position: absolute;
+            bottom: 70px;
+            right: 0;
+            width: 380px;
+            height: 500px;
+            background: var(--white);
+            border-radius: 16px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+            display: none;
+            flex-direction: column;
+        }
+
+        .chatbot-window.open {
+            display: flex;
+        }
+
+        .chatbot-header {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+            color: var(--white);
+            padding: 16px 20px;
+            border-radius: 16px 16px 0 0;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .chatbot-header i {
+            font-size: 20px;
+        }
+
+        .chatbot-title {
+            font-weight: 600;
+            font-size: 16px;
+        }
+
+        .chatbot-messages {
+            flex: 1;
+            padding: 20px;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        .message {
+            max-width: 80%;
+            padding: 12px 16px;
+            border-radius: 16px;
+            font-size: 14px;
+            line-height: 1.4;
+        }
+
+        .message.bot {
+            align-self: flex-start;
+            background: var(--accent-cream);
+            color: var(--text-primary);
+        }
+
+        .message.user {
+            align-self: flex-end;
+            background: var(--primary);
+            color: var(--white);
+        }
+
+        .message.typing {
+            background: var(--border);
+            color: var(--text-secondary);
+            font-style: italic;
+        }
+
+        .chatbot-input {
+            padding: 16px 20px;
+            border-top: 1px solid var(--border);
+            display: flex;
+            gap: 12px;
+        }
+
+        .chatbot-input input {
+            flex: 1;
+            padding: 10px 12px;
+            border: 2px solid var(--border);
+            border-radius: 20px;
+            font-size: 14px;
+            transition: border-color 0.3s ease;
+        }
+
+        .chatbot-input input:focus {
+            outline: none;
+            border-color: var(--primary);
+        }
+
+        .send-btn {
+            width: 36px;
+            height: 36px;
+            background: var(--primary);
+            color: var(--white);
+            border: none;
+            border-radius: 50%;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+        }
+
+        .send-btn:hover {
+            background: var(--secondary);
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .header-container {
+                padding: 0 15px;
+            }
+
+            .main-container {
+                padding: 20px 15px;
+            }
+
+            .products-grid {
+                grid-template-columns: 1fr;
+                gap: 16px;
+            }
+
+            .chatbot-window {
+                width: calc(100vw - 40px);
+                height: 400px;
+            }
+
+            .page-title {
+                font-size: 24px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <header class="header">
+        <div class="header-container">
+            <div class="logo">
+                <i class="fas fa-bridge"></i>
+                K-Bridge E-commerce
+            </div>
+            <div class="user-info">
+                <div class="user-badge">
+                    <i class="fas fa-shopping-cart"></i>
+                    US Buyer
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="main-container">
+        <h1 class="page-title">Korean Products</h1>
+        <p class="page-subtitle">Discover premium Korean products with AI-powered customs insights</p>
+
+        <div class="products-grid" id="productsGrid">
+            <!-- Products will be loaded here -->
+        </div>
+    </main>
+
+    <!-- Chatbot -->
+    <div class="chatbot-container">
+        <button class="chatbot-toggle" onclick="toggleChatbot()">
+            <i class="fas fa-comments"></i>
+        </button>
+        <div class="chatbot-window" id="chatbotWindow">
+            <div class="chatbot-header">
+                <i class="fas fa-robot"></i>
+                <div class="chatbot-title">AI Trade Assistant</div>
+            </div>
+            <div class="chatbot-messages" id="chatbotMessages">
+                <div class="message bot">
+                    Hello! I'm your AI trade assistant. Ask me about import requirements, regulations, or any product-specific concerns for purchasing from Korea.
+                </div>
+            </div>
+            <div class="chatbot-input">
+                <input type="text" id="chatInput" placeholder="Ask about import requirements..." onkeypress="handleChatKeypress(event)">
+                <button class="send-btn" onclick="sendMessage()">
+                    <i class="fas fa-paper-plane"></i>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Mock product data
+        const products = [
+            {
+                id: 'PRD001',
+                name: 'Premium Korean Ginseng Extract',
+                description: 'High-quality red ginseng extract with 6-year-old roots, perfect for health-conscious consumers.',
+                price: 89.99,
+                fobPrice: 65.00,
+                category: 'Health & Wellness',
+                icon: 'fas fa-leaf',
+                hsCode: '1211.20.10',
+                tariffRate: 0.0,
+                requirements: 'FDA registration required, must meet dietary supplement regulations',
+                precedents: 'Recent shipments required additional phytosanitary certificates due to plant-based ingredients'
+            },
+            {
+                id: 'PRD002',
+                name: 'Korean Beauty Skincare Set',
+                description: 'Complete K-beauty routine with cleanser, toner, serum, and moisturizer from premium Korean brands.',
+                price: 124.99,
+                fobPrice: 95.00,
+                category: 'Beauty & Cosmetics',
+                icon: 'fas fa-spa',
+                hsCode: '3304.99.00',
+                tariffRate: 0.0,
+                requirements: 'FDA cosmetic labeling requirements, ingredient disclosure needed',
+                precedents: 'Previous imports required updated ingredient lists for compliance with US cosmetic regulations'
+            },
+            {
+                id: 'PRD003',
+                name: 'Traditional Korean Ceramics',
+                description: 'Handcrafted ceramic dinnerware set featuring traditional Korean designs and craftsmanship.',
+                price: 199.99,
+                fobPrice: 150.00,
+                category: 'Home & Living',
+                icon: 'fas fa-utensils',
+                hsCode: '6912.00.48',
+                tariffRate: 8.5,
+                requirements: 'Lead content testing required for food-contact surfaces',
+                precedents: 'Similar ceramic imports faced delays due to lead testing requirements at customs'
+            },
+            {
+                id: 'PRD004',
+                name: 'Korean Green Tea Premium Grade',
+                description: 'Organic green tea leaves from Jeju Island, hand-picked and processed using traditional methods.',
+                price: 45.99,
+                fobPrice: 28.00,
+                category: 'Food & Beverage',
+                icon: 'fas fa-mug-hot',
+                hsCode: '0902.10.10',
+                tariffRate: 6.4,
+                requirements: 'Organic certification required, pesticide residue testing',
+                precedents: 'Recent tea shipments required additional organic certification documentation'
+            }
+        ];
+
+        let currentLanguage = 'en';
+        let chatState = null; // null, 'identifying', 'confirmed'
+        let pendingProductId = null;
+
+        // Initialize page
+        function initializePage() {
+            loadProducts();
+        }
+
+        // Load products
+        function loadProducts() {
+            const grid = document.getElementById('productsGrid');
+            grid.innerHTML = '';
+
+            products.forEach(product => {
+                const productCard = createProductCard(product);
+                grid.appendChild(productCard);
+            });
+        }
+
+        // Create product card
+        function createProductCard(product) {
+            const card = document.createElement('div');
+            card.className = 'product-card';
+            card.innerHTML = `
+                <div class="product-image">
+                    <i class="${product.icon}"></i>
+                    <div class="product-origin">${product.category}</div>
+                </div>
+                <div class="product-info">
+                    <h3 class="product-name">${product.name}</h3>
+                    <p class="product-description">${product.description}</p>
+                    <div class="product-price">${product.price}</div>
+                    <div class="quantity-section">
+                        <div class="quantity-label">Quantity</div>
+                        <div class="quantity-input-group">
+                            <input type="number" class="quantity-input" id="qty-${product.id}" min="1" value="1" onkeypress="handleQuantityKeypress(event, '${product.id}')">
+                            <button class="calculate-btn" onclick="calculateTariff('${product.id}')">
+                                <i class="fas fa-calculator"></i>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="tariff-info" id="tariff-${product.id}">
+                        <div class="tariff-amount" id="tariff-amount-${product.id}"></div>
+                        <div class="tariff-details" id="tariff-details-${product.id}"></div>
+                    </div>
+                </div>
+            `;
+            return card;
+        }
+
+        // Handle quantity keypress
+        function handleQuantityKeypress(event, productId) {
+            if (event.key === 'Enter') {
+                calculateTariff(productId);
+            }
+        }
+
+        // Calculate tariff
+        function calculateTariff(productId) {
+            const product = products.find(p => p.id === productId);
+            const quantity = parseInt(document.getElementById(`qty-${productId}`).value) || 1;
+            
+            // Calculate tariff based on FOB price
+            const totalFobValue = product.fobPrice * quantity;
+            const tariffAmount = totalFobValue * (product.tariffRate / 100);
+            const totalWithTariff = totalFobValue + tariffAmount;
+            
+            const tariffInfo = document.getElementById(`tariff-${productId}`);
+            const tariffAmountEl = document.getElementById(`tariff-amount-${productId}`);
+            const tariffDetailsEl = document.getElementById(`tariff-details-${productId}`);
+            
+            tariffAmountEl.textContent = `Estimated Tariff: ${tariffAmount.toFixed(2)}`;
+            tariffDetailsEl.textContent = `Total with tariff: ${totalWithTariff.toFixed(2)}`;
+            
+            tariffInfo.classList.add('show');
+        }
+
+        // Toggle chatbot
+        function toggleChatbot() {
+            const chatbotWindow = document.getElementById('chatbotWindow');
+            chatbotWindow.classList.toggle('open');
+        }
+
+        // Handle chat keypress
+        function handleChatKeypress(event) {
+            if (event.key === 'Enter') {
+                sendMessage();
+            }
+        }
+
+        // Send message
+        function sendMessage() {
+            const input = document.getElementById('chatInput');
+            const message = input.value.trim();
+            
+            if (!message) return;
+            
+            addMessage('user', message);
+            input.value = '';
+            
+            // Show typing indicator
+            showTyping();
+            
+            setTimeout(() => {
+                handleBotResponse(message);
+            }, 1000);
+        }
+
+        // Add message to chat
+        function addMessage(type, content) {
+            const messagesContainer = document.getElementById('chatbotMessages');
+            const message = document.createElement('div');
+            message.className = `message ${type}`;
+            message.textContent = content;
+            
+            messagesContainer.appendChild(message);
+            messagesContainer.scrollTop = messagesContainer.scrollHeight;
+        }
+
+        // Show typing indicator
+        function showTyping() {
+            const messagesContainer = document.getElementById('chatbotMessages');
+            const typing = document.createElement('div');
+            typing.className = 'message typing';
+            typing.id = 'typing-indicator';
+            typing.textContent = 'AI is typing...';
+            
+            messagesContainer.appendChild(typing);
+            messagesContainer.scrollTop = messagesContainer.scrollHeight;
+        }
+
+        // Remove typing indicator
+        function removeTyping() {
+            const typing = document.getElementById('typing-indicator');
+            if (typing) {
+                typing.remove();
+            }
+        }
+
+        // Handle bot response
+        function handleBotResponse(userMessage) {
+            removeTyping();
+            
+            const lowerMessage = userMessage.toLowerCase();
+            
+            // Check if user is asking about import requirements
+            if (lowerMessage.includes('import') && lowerMessage.includes('requirement')) {
+                const productMatches = findProductMatches(lowerMessage);
+                if (productMatches.length > 0) {
+                    chatState = 'identifying';
+                    pendingProductId = productMatches[0].id;
+                    addMessage('bot', `I found a product that might match: "${productMatches[0].name}". Is this the product you're asking about?`);
+                } else {
+                    addMessage('bot', 'I can help you with import requirements. Could you tell me which specific product you\'re interested in?');
+                }
+            }
+            // Handle confirmation
+            else if (chatState === 'identifying' && (lowerMessage.includes('yes') || lowerMessage.includes('yeah') || lowerMessage.includes('correct') || lowerMessage.includes('right'))) {
+                const product = products.find(p => p.id === pendingProductId);
+                if (product) {
+                    chatState = 'confirmed';
+                    addMessage('bot', `Here are the import requirements for ${product.name}:\n\n📋 Requirements: ${product.requirements}\n\n⚠️ Important Notes: ${product.precedents}\n\nWould you like more specific information about any aspect?`);
+                }
+            }
+            // Handle denial
+            else if (chatState === 'identifying' && (lowerMessage.includes('no') || lowerMessage.includes('wrong') || lowerMessage.includes('different'))) {
+                chatState = null;
+                pendingProductId = null;
+                addMessage('bot', 'I apologize for the confusion. Could you provide more details about the specific product you\'re interested in importing?');
+            }
+            // General help
+            else if (lowerMessage.includes('help') || lowerMessage.includes('what can you do')) {
+                addMessage('bot', 'I can help you with:\n• Import requirements for specific products\n• Tariff calculations\n• Customs regulations\n• Product compliance information\n\nJust ask me about any Korean product you\'re considering!');
+            }
+            // Default response
+            else {
+                addMessage('bot', 'I\'m here to help with import requirements and regulations. Try asking something like "What are the import requirements for [product name]?" or "Help me understand customs requirements."');
+            }
+        }
+
+        // Find product matches
+        function findProductMatches(message) {
+            const matches = [];
+            products.forEach(product => {
+                const productWords = product.name.toLowerCase().split(' ');
+                const messageWords = message.toLowerCase().split(' ');
+                
+                let matchCount = 0;
+                productWords.forEach(word => {
+                    if (messageWords.some(msgWord => msgWord.includes(word) || word.includes(msgWord))) {
+                        matchCount++;
+                    }
+                });
+                
+                if (matchCount >= 2) {
+                    matches.push({ ...product, matchCount });
+                }
+            });
+            
+            return matches.sort((a, b) => b.matchCount - a.matchCount);
+        }
+
+        // Toggle language (placeholder)
+        function toggleLanguage() {
+            // Language toggle functionality would be implemented here
+            console.log('Language toggle clicked');
+        }
+
+        // Initialize page when loaded
+        document.addEventListener('DOMContentLoaded', initializePage);
+    </script>
+</body>
+</html>
