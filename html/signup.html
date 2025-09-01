@@ -1,0 +1,719 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>K-Bridge E-commerce - Sign Up</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary: #D94F4F;
+            --secondary: #E99BAE;
+            --accent-cream: #F3E6D8;
+            --white: #ffffff;
+            --text-primary: #2c2c2c;
+            --text-secondary: #666666;
+            --shadow: rgba(217, 79, 79, 0.15);
+            --success: #4CAF50;
+            --error: #f44336;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: linear-gradient(135deg, var(--accent-cream) 0%, var(--white) 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .signup-screen {
+            width: 100%;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .signup-container {
+            display: flex;
+            background: var(--white);
+            border-radius: 20px;
+            box-shadow: 0 20px 60px var(--shadow);
+            overflow: hidden;
+            min-height: 600px;
+        }
+
+        /* Language Toggle */
+        .language-toggle {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: var(--white);
+            border: 2px solid var(--secondary);
+            border-radius: 25px;
+            padding: 8px 16px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-weight: 500;
+            color: var(--primary);
+            transition: all 0.3s ease;
+            z-index: 10;
+        }
+
+        .language-toggle:hover {
+            background: var(--secondary);
+            color: var(--white);
+        }
+
+        /* Brand Section */
+        .signup-brand {
+            flex: 1;
+            padding: 60px 50px;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+            color: var(--white);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            position: relative;
+        }
+
+        .signup-brand::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><pattern id="grain" width="100" height="100" patternUnits="userSpaceOnUse"><circle cx="25" cy="25" r="1" fill="rgba(255,255,255,0.03)"/><circle cx="75" cy="75" r="1" fill="rgba(255,255,255,0.03)"/><circle cx="50" cy="10" r="1" fill="rgba(255,255,255,0.03)"/><circle cx="10" cy="60" r="1" fill="rgba(255,255,255,0.03)"/></pattern></defs><rect width="100" height="100" fill="url(%23grain)"/></svg>');
+            opacity: 0.3;
+        }
+
+        .brand-logo {
+            font-size: 32px;
+            font-weight: 700;
+            margin-bottom: 30px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .brand-logo .icon {
+            width: 50px;
+            height: 50px;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+        }
+
+        .signup-brand h2 {
+            font-size: 28px;
+            font-weight: 600;
+            margin-bottom: 20px;
+            line-height: 1.3;
+            position: relative;
+            z-index: 1;
+        }
+
+        .signup-brand p {
+            font-size: 16px;
+            line-height: 1.6;
+            opacity: 0.9;
+            position: relative;
+            z-index: 1;
+        }
+
+        .features-list {
+            margin-top: 30px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .features-list .feature {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 16px;
+            font-size: 14px;
+            opacity: 0.9;
+        }
+
+        .features-list .feature i {
+            width: 20px;
+            height: 20px;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 10px;
+        }
+
+        /* Form Section */
+        .signup-form {
+            flex: 1;
+            padding: 60px 50px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        .signup-form h3 {
+            font-size: 28px;
+            font-weight: 600;
+            color: var(--primary);
+            margin-bottom: 8px;
+        }
+
+        .signup-form .subtitle {
+            color: var(--text-secondary);
+            margin-bottom: 40px;
+            font-size: 16px;
+        }
+
+        .form-group {
+            margin-bottom: 24px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+            color: var(--primary);
+            font-size: 14px;
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 16px 20px;
+            border: 2px solid #e0e0e0;
+            border-radius: 12px;
+            font-size: 16px;
+            transition: all 0.3s ease;
+            background: var(--white);
+        }
+
+        .form-control:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(217, 79, 79, 0.1);
+        }
+
+        .form-control::placeholder {
+            color: #999;
+        }
+
+        .form-control.error {
+            border-color: var(--error);
+        }
+
+        .form-control.success {
+            border-color: var(--success);
+        }
+
+        .error-message {
+            color: var(--error);
+            font-size: 12px;
+            margin-top: 4px;
+            display: none;
+        }
+
+        .success-message {
+            color: var(--success);
+            font-size: 12px;
+            margin-top: 4px;
+            display: none;
+        }
+
+        .password-strength {
+            margin-top: 8px;
+        }
+
+        .strength-bar {
+            height: 4px;
+            background: #e0e0e0;
+            border-radius: 2px;
+            overflow: hidden;
+            margin-bottom: 4px;
+        }
+
+        .strength-fill {
+            height: 100%;
+            width: 0%;
+            transition: all 0.3s ease;
+            border-radius: 2px;
+        }
+
+        .strength-text {
+            font-size: 12px;
+            color: var(--text-secondary);
+        }
+
+        .btn {
+            width: 100%;
+            padding: 16px 24px;
+            border: none;
+            border-radius: 12px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            margin-top: 12px;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+            color: var(--white);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(217, 79, 79, 0.3);
+        }
+
+        .btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+
+        .login-link {
+            text-align: center;
+            margin-top: 24px;
+            color: var(--text-secondary);
+        }
+
+        .login-link a {
+            color: var(--primary);
+            text-decoration: none;
+            font-weight: 600;
+            transition: color 0.3s ease;
+        }
+
+        .login-link a:hover {
+            color: var(--primary);
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .signup-container {
+                flex-direction: column;
+                margin: 20px;
+            }
+
+            .signup-brand,
+            .signup-form {
+                padding: 40px 30px;
+            }
+
+            .language-toggle {
+                top: 10px;
+                right: 10px;
+                padding: 6px 12px;
+                font-size: 14px;
+            }
+        }
+
+        /* Loading Animation */
+        .loading {
+            opacity: 0.7;
+            pointer-events: none;
+        }
+
+        .loading .btn-primary {
+            background: #ccc;
+        }
+
+        .spinner {
+            width: 20px;
+            height: 20px;
+            border: 2px solid transparent;
+            border-top: 2px solid var(--white);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+    <div class="language-toggle" onclick="toggleLanguage()">
+        <i class="fas fa-globe"></i>
+        <span id="currentLang">한국어</span>
+        <i class="fas fa-chevron-down"></i>
+    </div>
+
+    <div class="signup-screen">
+        <div class="signup-container">
+            <div class="signup-brand">
+                <div class="brand-logo">
+                    <div class="icon">
+                        <i class="fas fa-bridge"></i>
+                    </div>
+                    <span data-key="brandName">K-브릿지 이커머스</span>
+                </div>
+                <h2 data-key="brandSlogan">한국의 최고를 미국으로, 쉽고 간편하게</h2>
+                <p data-key="brandDescription">새로운 미국 관세 변화가 걱정되시나요? 저희가 해결해드립니다. AI 플랫폼으로 관세와 규정을 즉시 명확하게 파악하세요.</p>
+                
+                <div class="features-list">
+                    <div class="feature">
+                        <i class="fas fa-check"></i>
+                        <span data-key="feature1">정확한 관세 계산</span>
+                    </div>
+                    <div class="feature">
+                        <i class="fas fa-check"></i>
+                        <span data-key="feature2">업데이트 규정 반영</span>
+                    </div>
+                    <div class="feature">
+                        <i class="fas fa-check"></i>
+                        <span data-key="feature3">전문 관세사 검토</span>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="signup-form">
+                <h3 data-key="signupTitle">계정 만들기</h3>
+                <p class="subtitle" data-key="signupSubtitle">무료로 시작하여 스마트 무역의 혜택을 경험하세요</p>
+                
+                <form id="signupForm" onsubmit="handleSignup(event)">
+                    <div class="form-group">
+                        <label data-key="nameLabel">이름</label>
+                        <input type="text" id="name" class="form-control" data-placeholder-key="namePlaceholder" placeholder="이름을 입력하세요" required>
+                        <div class="error-message" id="nameError"></div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label data-key="emailLabel">이메일 주소</label>
+                        <input type="email" id="email" class="form-control" data-placeholder-key="emailPlaceholder" placeholder="이메일을 입력하세요" required>
+                        <div class="error-message" id="emailError"></div>
+                        <div class="success-message" id="emailSuccess"></div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label data-key="passwordLabel">비밀번호</label>
+                        <input type="password" id="password" class="form-control" data-placeholder-key="passwordPlaceholder" placeholder="비밀번호를 입력하세요" required>
+                        <div class="password-strength" id="passwordStrength" style="display: none;">
+                            <div class="strength-bar">
+                                <div class="strength-fill" id="strengthFill"></div>
+                            </div>
+                            <div class="strength-text" id="strengthText"></div>
+                        </div>
+                        <div class="error-message" id="passwordError"></div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label data-key="accountTypeLabel">계정 유형</label>
+                        <select id="accountType" class="form-control" required>
+                            <option value="" data-key="selectRole">유형을 선택하세요</option>
+                            <option value="seller" data-key="sellerOption">판매자 (한국 수출업체)</option>
+                            <option value="buyer" data-key="buyerOption">구매자 (미국 수입업체)</option>
+                            <option value="customs" data-key="customsOption">관세사</option>
+                        </select>
+                        <div class="error-message" id="accountTypeError"></div>
+                    </div>
+                    
+                    <button type="submit" class="btn btn-primary" id="signupBtn">
+                        <i class="fas fa-user-plus"></i>
+                        <span data-key="signupButton">계정 만들기</span>
+                    </button>
+                </form>
+                
+                <div class="login-link">
+                    <span data-key="existingUser">이미 계정이 있으신가요?</span>
+                    <a href="#" data-key="signInLink">로그인</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // 다국어 지원
+        const translations = {
+            ko: {
+                brandName: "K-브릿지 이커머스",
+                brandSlogan: "한국의 최고를 미국으로, 쉽고 간편하게",
+                brandDescription: "새로운 미국 관세 변화가 걱정되시나요? 저희가 해결해드립니다. AI 플랫폼으로 관세와 규정을 즉시 명확하게 파악하세요.",
+                feature1: "명확한 관세 계산",
+                feature2: "업데이트 규정 반영",
+                feature3: "전문 관세사 검토",
+                signupTitle: "계정 만들기",
+                signupSubtitle: "무료로 시작하여 스마트 무역의 혜택을 경험하세요",
+                nameLabel: "이름",
+                namePlaceholder: "이름을 입력하세요",
+                emailLabel: "이메일 주소",
+                emailPlaceholder: "이메일을 입력하세요",
+                passwordLabel: "비밀번호",
+                passwordPlaceholder: "비밀번호를 입력하세요 (8자 이상)",
+                accountTypeLabel: "계정 유형",
+                selectRole: "유형을 선택하세요",
+                sellerOption: "판매자 (한국 수출업체)",
+                buyerOption: "구매자 (미국 수입업체)",
+                customsOption: "관세사",
+                signupButton: "계정 만들기",
+                existingUser: "이미 계정이 있으신가요?",
+                signInLink: "로그인",
+                // 유효성 검사 메시지
+                nameRequired: "이름을 입력해주세요",
+                emailRequired: "이메일을 입력해주세요",
+                emailInvalid: "올바른 이메일 형식이 아닙니다",
+                emailAvailable: "사용 가능한 이메일입니다",
+                passwordRequired: "비밀번호를 입력해주세요",
+                passwordTooShort: "비밀번호는 8자 이상이어야 합니다",
+                accountTypeRequired: "계정 유형을 선택해주세요",
+                // 비밀번호 강도
+                strengthWeak: "약함",
+                strengthMedium: "보통",
+                strengthStrong: "강함",
+                strengthVeryStrong: "매우 강함"
+            },
+            en: {
+                brandName: "The K-Bridge E-commerce",
+                brandSlogan: "Bridging Korea's Best to the US, Effortlessly",
+                brandDescription: "Worried about the new US customs changes? We've got you covered. Our AI platform provides instant clarity on tariffs and regulations.",
+                feature1: "Accurate Customs Calculation",
+                feature2: "Update Regulation Reflection",
+                feature3: "Professional Customs Review",
+                signupTitle: "Create Account",
+                signupSubtitle: "Start free and experience the benefits of smart trade",
+                nameLabel: "Name",
+                namePlaceholder: "Enter your name",
+                emailLabel: "Email Address",
+                emailPlaceholder: "Enter your email",
+                passwordLabel: "Password",
+                passwordPlaceholder: "Enter your password (8+ characters)",
+                accountTypeLabel: "Account Type",
+                selectRole: "Select your role",
+                sellerOption: "Korean Exporter",
+                buyerOption: "US Buyer",
+                customsOption: "Customs Broker",
+                signupButton: "Create Account",
+                existingUser: "Already have an account?",
+                signInLink: "Sign In",
+                // 유효성 검사 메시지
+                nameRequired: "Please enter your name",
+                emailRequired: "Please enter your email",
+                emailInvalid: "Please enter a valid email format",
+                emailAvailable: "Email is available",
+                passwordRequired: "Please enter your password",
+                passwordTooShort: "Password must be at least 8 characters",
+                accountTypeRequired: "Please select your account type",
+                // 비밀번호 강도
+                strengthWeak: "Weak",
+                strengthMedium: "Medium",
+                strengthStrong: "Strong",
+                strengthVeryStrong: "Very Strong"
+            }
+        };
+
+        let currentLanguage = 'ko';
+
+        function toggleLanguage() {
+            currentLanguage = currentLanguage === 'ko' ? 'en' : 'ko';
+            updateLanguage();
+        }
+
+        function updateLanguage() {
+            const langToggle = document.getElementById('currentLang');
+            langToggle.textContent = currentLanguage === 'ko' ? '한국어' : 'English';
+            
+            document.documentElement.lang = currentLanguage;
+            
+            // 텍스트 요소들 업데이트
+            document.querySelectorAll('[data-key]').forEach(element => {
+                const key = element.getAttribute('data-key');
+                if (translations[currentLanguage][key]) {
+                    element.textContent = translations[currentLanguage][key];
+                }
+            });
+            
+            // placeholder 업데이트
+            document.querySelectorAll('[data-placeholder-key]').forEach(element => {
+                const key = element.getAttribute('data-placeholder-key');
+                if (translations[currentLanguage][key]) {
+                    element.placeholder = translations[currentLanguage][key];
+                }
+            });
+        }
+
+        // 비밀번호 강도 검사
+        function checkPasswordStrength(password) {
+            const strengthIndicator = document.getElementById('passwordStrength');
+            const strengthFill = document.getElementById('strengthFill');
+            const strengthText = document.getElementById('strengthText');
+            
+            if (password.length === 0) {
+                strengthIndicator.style.display = 'none';
+                return;
+            }
+            
+            strengthIndicator.style.display = 'block';
+            
+            let strength = 0;
+            let strengthLabel = '';
+            let color = '';
+            
+            // 길이 검사
+            if (password.length >= 8) strength += 25;
+            // 대문자 검사
+            if (/[A-Z]/.test(password)) strength += 25;
+            // 소문자 검사
+            if (/[a-z]/.test(password)) strength += 25;
+            // 숫자 또는 특수문자 검사
+            if (/[\d\W]/.test(password)) strength += 25;
+            
+            if (strength < 50) {
+                strengthLabel = translations[currentLanguage].strengthWeak;
+                color = '#f44336';
+            } else if (strength < 75) {
+                strengthLabel = translations[currentLanguage].strengthMedium;
+                color = '#ff9800';
+            } else if (strength < 100) {
+                strengthLabel = translations[currentLanguage].strengthStrong;
+                color = '#2196f3';
+            } else {
+                strengthLabel = translations[currentLanguage].strengthVeryStrong;
+                color = '#4caf50';
+            }
+            
+            strengthFill.style.width = strength + '%';
+            strengthFill.style.backgroundColor = color;
+            strengthText.textContent = strengthLabel;
+            strengthText.style.color = color;
+        }
+
+        // 이메일 유효성 검사
+        function validateEmail(email) {
+            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            const emailInput = document.getElementById('email');
+            const emailError = document.getElementById('emailError');
+            const emailSuccess = document.getElementById('emailSuccess');
+            
+            emailError.style.display = 'none';
+            emailSuccess.style.display = 'none';
+            emailInput.classList.remove('error', 'success');
+            
+            if (!email) {
+                emailError.textContent = translations[currentLanguage].emailRequired;
+                emailError.style.display = 'block';
+                emailInput.classList.add('error');
+                return false;
+            }
+            
+            if (!emailRegex.test(email)) {
+                emailError.textContent = translations[currentLanguage].emailInvalid;
+                emailError.style.display = 'block';
+                emailInput.classList.add('error');
+                return false;
+            }
+            
+            emailSuccess.textContent = translations[currentLanguage].emailAvailable;
+            emailSuccess.style.display = 'block';
+            emailInput.classList.add('success');
+            return true;
+        }
+
+        // 폼 이벤트 리스너
+        document.getElementById('email').addEventListener('blur', function() {
+            validateEmail(this.value);
+        });
+
+        document.getElementById('password').addEventListener('input', function() {
+            checkPasswordStrength(this.value);
+        });
+
+        function handleSignup(event) {
+            event.preventDefault();
+            
+            const form = event.target;
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+            const accountType = document.getElementById('accountType').value;
+            const button = document.getElementById('signupBtn');
+            const buttonText = button.querySelector('span');
+            const icon = button.querySelector('i');
+            
+            // 유효성 검사
+            let isValid = true;
+            
+            // 이메일 검사
+            if (!validateEmail(email)) {
+                isValid = false;
+            }
+            
+            // 비밀번호 검사
+            const passwordError = document.getElementById('passwordError');
+            const passwordInput = document.getElementById('password');
+            passwordError.style.display = 'none';
+            passwordInput.classList.remove('error');
+            
+            if (!password) {
+                passwordError.textContent = translations[currentLanguage].passwordRequired;
+                passwordError.style.display = 'block';
+                passwordInput.classList.add('error');
+                isValid = false;
+            } else if (password.length < 8) {
+                passwordError.textContent = translations[currentLanguage].passwordTooShort;
+                passwordError.style.display = 'block';
+                passwordInput.classList.add('error');
+                isValid = false;
+            }
+            
+            // 계정 유형 검사
+            const accountTypeError = document.getElementById('accountTypeError');
+            const accountTypeInput = document.getElementById('accountType');
+            accountTypeError.style.display = 'none';
+            accountTypeInput.classList.remove('error');
+            
+            if (!accountType) {
+                accountTypeError.textContent = translations[currentLanguage].accountTypeRequired;
+                accountTypeError.style.display = 'block';
+                accountTypeInput.classList.add('error');
+                isValid = false;
+            }
+            
+            if (!isValid) return;
+            
+            // 로딩 상태
+            form.classList.add('loading');
+            button.disabled = true;
+            icon.className = 'spinner';
+            buttonText.textContent = currentLanguage === 'ko' ? '계정 생성 중...' : 'Creating Account...';
+            
+            // 실제 회원가입 로직은 여기에 구현
+            setTimeout(() => {
+                // 성공 시뮬레이션
+                alert(currentLanguage === 'ko' ? '회원가입 성공! 환영합니다.' : 'Account created successfully! Welcome.');
+                
+                // 로딩 상태 해제
+                form.classList.remove('loading');
+                button.disabled = false;
+                icon.className = 'fas fa-user-plus';
+                buttonText.textContent = translations[currentLanguage].signupButton;
+            }, 2000);
+        }
+
+        // 초기 언어 설정
+        updateLanguage();
+    </script>
+</body>
+</html>
