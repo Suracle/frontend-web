@@ -1,38 +1,61 @@
 // src/app/routes.tsx
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
-import AppLayout from "@/components/layout/AppLayout";
-import SearchPage from "@/pages/SearchPage/SearchPage";   // 검색 페이지
-import ChatPage from "@/pages/ChatPage/ChatPage";       // Q&A 챗봇 페이지
-import DashboardPage from "@/pages/DashboardPage/DashboardPage"; // 대시보드 페이지
-import DocumentPage from "@/pages/DocumentPage/DocumentPage";   // 문서 상세 페이지
-import HomePage from "@/pages/HomePage/HomePage";
+
+// 새로 추가된 페이지들
+import LoginPage from "@/pages/Authentication/LoginPage";
+import SignupPage from "@/pages/Authentication/SignupPage";
+import ProductsSellerPage from "@/pages/Seller/ProductsSellerPage";
+import ProductDetailPage from "@/pages/Seller/ProductDetailPage";
+import ProductRegistrationPage from "@/pages/Seller/ProductRegistrationPage";
+import ProductsBuyerPage from "@/pages/Buyer/ProductsBuyerPage";
+import RequestListPage from "@/pages/Broker/RequestListPage";
+import ReviewPage from "@/pages/Broker/ReviewPage";
+import UserTypeSelectionPage from "@/pages/UserTypeSelectionPage";
 
 const router = createBrowserRouter([
   {
     path: "/",
-    element: <AppLayout />,
-    children: [
-      {
-        index: true,
-        element: <HomePage />,
-      },
-      {
-        path: "search",
-        element: <SearchPage />,
-      },
-      {
-        path: "chat",
-        element: <ChatPage />,
-      },
-      {
-        path: "dashboard",
-        element: <DashboardPage />,
-      },
-      {
-        path: "document",
-        element: <DocumentPage />,
-      },
-    ],
+    element: <LoginPage />,
+  },
+  // 인증 페이지들
+  {
+    path: "/login",
+    element: <LoginPage />,
+  },
+  {
+    path: "/signup",
+    element: <SignupPage />,
+  },
+  {
+    path: "/user-type-selection",
+    element: <UserTypeSelectionPage />,
+  },
+  // 판매자 페이지들
+  {
+    path: "/seller/products",
+    element: <ProductsSellerPage />,
+  },
+  {
+    path: "/seller/products/:id",
+    element: <ProductDetailPage />,
+  },
+  {
+    path: "/seller/products/register",
+    element: <ProductRegistrationPage />,
+  },
+  // 구매자 페이지들
+  {
+    path: "/buyer/products",
+    element: <ProductsBuyerPage />,
+  },
+  // 브로커 페이지들
+  {
+    path: "/broker/requests",
+    element: <RequestListPage />,
+  },
+  {
+    path: "/broker/review/:id",
+    element: <ReviewPage />,
   },
 ]);
 

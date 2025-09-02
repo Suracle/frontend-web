@@ -1,18 +1,13 @@
 import * as React from "react";
 import { Outlet, useLocation, useNavigate } from "react-router-dom";
 import { cn } from "@/lib/utils";
-import { ThemeToggle } from "@/components/ui";
 import { 
-  Search, 
   MessageSquare, 
   BarChart3, 
   FileText, 
   History, 
   Star, 
-  BookOpen,
-  Menu,
-  Bell,
-  Settings
+  BookOpen
 } from "lucide-react";
 
 interface NavItem {
@@ -51,64 +46,13 @@ function getCategoryColor(name: string): string {
 export default function AppLayout() {
   const location = useLocation();
   const navigate = useNavigate();
-  const [sidebarOpen, setSidebarOpen] = React.useState(true);
+  const [sidebarOpen] = React.useState(true);
 
   const currentPath = location.pathname;
 
   return (
     <div className="min-h-screen bg-slate-50 dark:bg-slate-900 transition-colors">
-        {/* Top Header */}
-        <header className="sticky top-0 z-50 border-b border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 shadow-sm">
-        <div className="flex items-center justify-between px-4 h-16">
-          {/* Left: Logo + Menu Toggle */}
-          <div className="flex items-center gap-4">
-            <button
-              onClick={() => setSidebarOpen(!sidebarOpen)}
-              className="p-2 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors"
-            >
-              <Menu className="h-5 w-5" />
-            </button>
-            <div className="flex items-center gap-2">
-                          <div className="w-8 h-8 bg-slate-900 dark:bg-slate-800 rounded-lg flex items-center justify-center">
-              <span className="text-white font-bold text-sm">L</span>
-            </div>
-              <span className="font-semibold text-lg text-slate-900 dark:text-slate-100">Legal Q&A</span>
-            </div>
-          </div>
 
-          {/* Center: Search Bar */}
-          <div className="flex-1 max-w-2xl mx-8">
-            <div className="relative">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
-              <input
-                 type="text"
-                 placeholder="법령·판례·질의 기록 검색 (Enter → 질의하기)"
-                                   className="w-full pl-10 pr-4 py-2 rounded-lg border border-slate-300 dark:border-slate-600 bg-slate-50 dark:bg-slate-800 text-slate-900 dark:text-slate-100 placeholder:text-slate-500 dark:placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-slate-700 dark:focus:ring-slate-600"
-                 onKeyDown={(e) => {
-                   if (e.key === 'Enter') {
-                     navigate('/');
-                   }
-                 }}
-               />
-            </div>
-          </div>
-
-          {/* Right: Actions */}
-          <div className="flex items-center gap-3">
-            <ThemeToggle />
-            <button className="p-2 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors relative">
-              <Bell className="h-5 w-5" />
-              <span className="absolute top-1 right-1 w-2 h-2 bg-red-500 rounded-full"></span>
-            </button>
-            <button className="p-2 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors">
-              <Settings className="h-5 w-5" />
-            </button>
-            <button className="w-8 h-8 bg-slate-700 rounded-full flex items-center justify-center text-white font-medium text-sm">
-              HJ
-            </button>
-          </div>
-        </div>
-      </header>
 
       <div className="flex">
         {/* Sidebar */}

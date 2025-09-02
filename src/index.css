@@ -1,114 +1,264 @@
 @import "tailwindcss";
 
-/* 기본 스타일 */
-@layer base {
-  html {
-    font-family: system-ui, sans-serif;
+@keyframes slide-in-right {
+  from {
+    transform: translateX(100%);
+    opacity: 0;
   }
-  
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+.animate-slide-in-right {
+  animation: slide-in-right 0.3s ease-out;
+}
+
+@layer base {
+  html, body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+  }
+
   body {
     margin: 0;
     padding: 0;
   }
+
+  /* Font Awesome 강제 로드 및 스타일 - 강화 버전 */
+  .fas, .far, .fab, .fa {
+    display: inline-block !important;
+    font-style: normal !important;
+    font-variant: normal !important;
+    text-rendering: auto !important;
+    line-height: 1 !important;
+    font-family: "Font Awesome 6 Free", "Font Awesome 6 Pro", "Font Awesome 6 Brands", "FontAwesome" !important;
+    font-weight: 900 !important;
+    -webkit-font-smoothing: antialiased !important;
+    -moz-osx-font-smoothing: grayscale !important;
+  }
+
+  /* Font Awesome Free Regular */
+  .far {
+    font-weight: 400 !important;
+  }
+
+  /* Font Awesome Brands */
+  .fab {
+    font-weight: 400 !important;
+  }
+
+  /* 특정 아이콘들 강제 정의 - 버튼 클릭 시에도 작동하도록 */
+  .fa-bridge::before {
+    content: "\f52a" !important;
+  }
+
+  .fa-plus::before {
+    content: "\f067" !important;
+  }
+
+  .fa-edit::before {
+    content: "\f044" !important;
+  }
+
+  .fa-trash::before {
+    content: "\f1f8" !important;
+  }
+
+  .fa-leaf::before {
+    content: "\f06c" !important;
+  }
+
+  .fa-spa::before {
+    content: "\f5bb" !important;
+  }
+
+  .fa-mug-hot::before {
+    content: "\f7b6" !important;
+  }
+
+  .fa-seedling::before {
+    content: "\f4d8" !important;
+  }
+
+  .fa-box::before {
+    content: "\f466" !important;
+  }
+
+  .fa-clock::before {
+    content: "\f017" !important;
+  }
+
+  .fa-check::before {
+    content: "\f00c" !important;
+  }
+
+  .fa-chart-line::before {
+    content: "\f201" !important;
+  }
+
+  .fa-chevron-left::before {
+    content: "\f053" !important;
+  }
+
+  .fa-chevron-right::before {
+    content: "\f054" !important;
+  }
+
+  /* 커스텀 CSS 변수들 */
+  :root {
+    --primary: #D94F4F;
+    --secondary: #E99BAE;
+    --accent-cream: #F3E6D8;
+    --white: #ffffff;
+    --text-primary: #2c2c2c;
+    --text-secondary: #666666;
+    --light-gray: #f8f9fa;
+    --border: #e0e0e0;
+    --shadow: rgba(217, 79, 79, 0.15);
+    --success: #4CAF50;
+    --warning: #ff9800;
+    --info: #2196f3;
+    --danger: #f44336;
+  }
+
+  /* Tailwind 클래스로 CSS 변수 연결 */
+  .text-primary { color: var(--primary) !important; }
+  .text-secondary { color: var(--secondary) !important; }
+  .text-text-primary { color: var(--text-primary) !important; }
+  .text-text-secondary { color: var(--text-secondary) !important; }
+  .bg-primary { background-color: var(--primary) !important; }
+  .bg-secondary { background-color: var(--secondary) !important; }
+  .bg-accent-cream { background-color: var(--accent-cream) !important; }
+  .border-primary { border-color: var(--primary) !important; }
+  .border-secondary { border-color: var(--secondary) !important; }
+  .border-border { border-color: var(--border) !important; }
+  
+  /* 그라데이션 클래스 */
+  .bg-gradient-primary { background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%) !important; }
+  .bg-gradient-secondary { background: linear-gradient(135deg, var(--accent-cream) 0%, var(--secondary) 100%) !important; }
+  .bg-gradient-accent { background: linear-gradient(135deg, var(--accent-cream) 0%, var(--white) 100%) !important; }
+  
+  /* 포커스 스타일 */
+  .focus-ring-primary:focus { 
+    outline: none !important; 
+    border-color: var(--primary) !important; 
+    box-shadow: 0 0 0 3px rgba(217, 79, 79, 0.1) !important; 
+  }
 }
 
-/* 라이트모드 강제 스타일 */
-@layer utilities {
-  /* 라이트모드에서 흰색 배경 강제 적용 */
-  html:not(.dark) .bg-white {
-    background-color: #ffffff !important;
+@layer components {
+  .btn-primary {
+    background-color: var(--color-primary);
+    color: white;
+    padding: 0.75rem 1.5rem;
+    border-radius: 0.5rem;
+    font-weight: 500;
+    transition: all 0.2s;
   }
+
+  .btn-primary:hover {
+    background-color: color-mix(in srgb, var(--color-primary) 90%, transparent);
+  }
+
+  .btn-secondary {
+    background-color: var(--color-secondary);
+    color: white;
+    padding: 0.75rem 1.5rem;
+    border-radius: 0.5rem;
+    font-weight: 500;
+    transition: all 0.2s;
+  }
+
+  .btn-secondary:hover {
+    background-color: color-mix(in srgb, var(--color-secondary) 90%, transparent);
+  }
+
+  .card {
+    background-color: white;
+    border-radius: 1rem;
+    box-shadow: 0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1);
+    overflow: hidden;
+  }
+
+  .input-field {
+    width: 100%;
+    padding: 0.75rem 1rem;
+    border: 1px solid var(--color-border);
+    border-radius: 0.5rem;
+    outline: none;
+    transition: all 0.2s;
+  }
+
+  .input-field:focus {
+    border-color: var(--color-primary);
+    box-shadow: 0 0 0 3px color-mix(in srgb, var(--color-primary) 20%, transparent);
+  }
+
+  /* Font Awesome 특정 아이콘 스타일 */
+  .fa-bridge {
+    font-size: 1.5em;
+  }
+
+  /* 상태 배지 스타일 */
+  /* .status-badge {
+    padding: 0.5rem 1rem;
+    border-radius: 1.25rem;
+    font-size: 0.875rem;
+    font-weight: 600;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.375rem;
+  } */
   
-  html:not(.dark) .bg-slate-50 {
-    background-color: #f8fafc !important;
+/* 
+  .status-badge.not-reviewed {
+    background: rgba(158, 158, 158, 0.1);
+    color: #9e9e9e;
   }
-  
-  /* 라이트모드에서 텍스트 색상 강제 적용 */
-  html:not(.dark) .text-slate-900 {
-    color: #0f172a !important;
+
+  .status-badge.pending {
+    background: rgba(255, 152, 0, 0.1);
+    color: var(--warning);
   }
-  
-  html:not(.dark) .text-slate-800 {
-    color: #1e293b !important;
+
+  .status-badge.approved {
+    background: rgba(76, 175, 80, 0.1);
+    color: var(--success);
   }
-  
-  html:not(.dark) .text-slate-600 {
-    color: #475569 !important;
-  }
-  
-  html:not(.dark) .text-slate-500 {
-    color: #64748b !important;
-  }
-  
-  html:not(.dark) .text-slate-400 {
-    color: #94a3b8 !important;
-  }
-  
-  /* 라이트모드에서 테두리 색상 강제 적용 */
-  html:not(.dark) .border-slate-200 {
-    border-color: #e2e8f0 !important;
-  }
-  
-  html:not(.dark) .border-slate-300 {
-    border-color: #cbd5e1 !important;
-  }
-  
-  html:not(.dark) .border-slate-600 {
-    border-color: #475569 !important;
-  }
+
+  .status-badge.rejected {
+    background: rgba(244, 67, 54, 0.1);
+    color: var(--danger);
+  } */
+
+  .status-badge {
+    padding: 6px 12px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 600;
 }
 
-/* 다크모드 강제 스타일 */
-@layer utilities {
-  /* 다크모드에서 테두리 색상 강제 적용 */
-  html.dark .border-slate-200 {
-    border-color: #475569 !important; /* 회색 테두리 */
-  }
-  
-  html.dark .border-slate-300 {
-    border-color: #64748b !important; /* 밝은 회색 테두리 */
-  }
-  
-  html.dark .border-slate-600 {
-    border-color: #94a3b8 !important; /* 하얀색에 가까운 회색 테두리 */
-  }
-  
-  html.dark .border-slate-700 {
-    border-color: #cbd5e1 !important; /* 하얀색 테두리 */
-  }
-  
-  /* 다크모드에서 배경색 강제 적용 */
-  html.dark .bg-white {
-    background-color: #1e293b !important; /* slate-800 배경 */
-  }
-  
-  html.dark .bg-slate-50 {
-    background-color: #334155 !important; /* slate-700 배경 */
-  }
-  
-  /* 다크모드에서 텍스트 색상 강제 적용 */
-  html.dark .text-slate-900 {
-    color: #f1f5f9 !important; /* slate-100 텍스트 */
-  }
-  
-  html.dark .text-slate-800 {
-    color: #e2e8f0 !important; /* slate-200 텍스트 */
-  }
-  
-  html.dark .text-slate-600 {
-    color: #cbd5e1 !important; /* slate-300 텍스트 */
-  }
-  
-  html.dark .text-slate-500 {
-    color: #94a3b8 !important; /* slate-400 텍스트 */
-  }
-  
-  html.dark .text-slate-400 {
-    color: #64748b !important; /* slate-500 텍스트 */
-  }
-  
-  /* 테마 전환 애니메이션 */
-  .theme-toggle-transition {
-    transition: all 0.2s ease-in-out;
-  }
+.status-badge.pending {
+    background: rgba(255, 152, 0, 0.1);
+    color: var(--warning);
+}
+
+.status-badge.approved {
+    background: rgba(76, 175, 80, 0.1);
+    color: var(--success);
+}
+
+.status-badge.not-reviewed {
+    background: rgba(158, 158, 158, 0.1);
+    color: #9e9e9e;
+}
+
+
+.status-badge.rejected {
+  background: rgba(244, 67, 54, 0.1);
+  color: var(--danger);
+}
+
+
 }
