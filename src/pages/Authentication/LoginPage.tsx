@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { Globe, LogIn, Eye, EyeOff, Building2 } from 'lucide-react';
+import { userApi, type LoginRequest } from '../../api/userApi';
 
 const LoginPage: React.FC = () => {
   const navigate = useNavigate();
@@ -12,6 +13,8 @@ const LoginPage: React.FC = () => {
     rememberMe: false,
   });
   const [showPassword, setShowPassword] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<string>('');
 
   // 다국어 지원
   const translations = {
@@ -72,23 +75,46 @@ const LoginPage: React.FC = () => {
     setCurrentLanguage(prev => prev === 'ko' ? 'en' : 'ko');
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
-    // 계정 유형에 따른 페이지 이동
-    switch (formData.accountType) {
-      case 'seller':
-        navigate('/seller/products');
-        break;
-      case 'buyer':
-        navigate('/buyer/products');
-        break;
-      case 'customs':
-        navigate('/broker/requests');
-        break;
-      default:
-        console.log('Login attempt:', formData);
-        // TODO: 로그인 로직 구현
+    setError('');
+    setIsLoading(true);
+
+    try {
+      // 백엔드 API 호출을 위한 데이터 변환
+      const loginData: LoginRequest = {
+        email: formData.email,
+        password: formData.password,
+      };
+
+      const response = await userApi.login(loginData);
+      
+      // 로그인 성공 시 사용자 정보 저장 (간단한 localStorage 사용)
+      localStorage.setItem('user', JSON.stringify(response));
+      
+      // 계정 유형에 따른 페이지 이동
+      switch (response.userType) {
+        case 'SELLER':
+          navigate('/seller/products');
+          break;
+        case 'BUYER':
+          navigate('/buyer/products');
+          break;
+        case 'BROKER':
+          navigate('/broker/requests');
+          break;
+        default:
+          navigate('/');
+      }
+    } catch (error: any) {
+      console.error('Login error:', error);
+      if (error.response?.status === 401) {
+        setError('이메일 또는 비밀번호가 올바르지 않습니다.');
+      } else {
+        setError('로그인 중 오류가 발생했습니다. 다시 시도해주세요.');
+      }
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -178,25 +204,11 @@ const LoginPage: React.FC = () => {
                   </div>
                 </div>
 
-                <div style={{ marginBottom: '24px' }}>
-                  <label htmlFor="accountType" className="block text-primary mb-2" style={{ fontSize: '14px', fontWeight: '500' }}>
-                    {translations[currentLanguage].accountTypeLabel}
-                  </label>
-                  <select
-                    id="accountType"
-                    name="accountType"
-                    value={formData.accountType}
-                    onChange={handleInputChange}
-                    className="w-full border-2 border-gray-300 rounded-lg focus-ring-primary transition-colors"
-                    style={{ fontSize: '16px', padding: '16px 20px' }}
-                    required
-                  >
-                    <option value="">{translations[currentLanguage].selectRole}</option>
-                    <option value="seller">{translations[currentLanguage].sellerOption}</option>
-                    <option value="buyer">{translations[currentLanguage].buyerOption}</option>
-                    <option value="customs">{translations[currentLanguage].customsOption}</option>
-                  </select>
-                </div>
+                {error && (
+                  <div className="mb-4 p-3 bg-red-50 border border-red-200 rounded-lg">
+                    <p className="text-red-600 text-sm">{error}</p>
+                  </div>
+                )}
 
                 <div className="flex items-center justify-between" style={{ marginBottom: '12px' }}>
                   <label className="flex items-center">
@@ -218,11 +230,12 @@ const LoginPage: React.FC = () => {
 
                 <button
                   type="submit"
-                  className="w-full bg-gradient-primary text-white py-4 px-6 rounded-lg font-semibold transition-colors duration-200 flex items-center justify-center gap-2"
+                  disabled={isLoading}
+                  className="w-full bg-gradient-primary text-white py-4 px-6 rounded-lg font-semibold transition-colors duration-200 flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
                   style={{ fontSize: '16px' }}
                 >
                   <LogIn size={20} />
-                  {translations[currentLanguage].signInButton}
+                  {isLoading ? '로그인 중...' : translations[currentLanguage].signInButton}
                 </button>
 
                 <div className="text-center">

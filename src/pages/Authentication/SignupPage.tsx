@@ -1,8 +1,10 @@
 import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { Globe, Building2, Check, UserPlus } from 'lucide-react';
+import { userApi, type SignupRequest } from '../../api/userApi';
 
 const SignupPage: React.FC = () => {
+  const navigate = useNavigate();
   const [currentLanguage, setCurrentLanguage] = useState<'ko' | 'en'>('ko');
   const [formData, setFormData] = useState({
     email: '',
@@ -17,6 +19,8 @@ const SignupPage: React.FC = () => {
   });
 
   const [errors, setErrors] = useState<Record<string, string>>({});
+  const [isLoading, setIsLoading] = useState(false);
+  const [successMessage, setSuccessMessage] = useState<string>('');
 
   // 다국어 지원
   const translations = {
@@ -104,7 +108,7 @@ const SignupPage: React.FC = () => {
     if (!formData.firstName) newErrors.firstName = '이름을 입력해주세요';
     if (!formData.lastName) newErrors.lastName = '성을 입력해주세요';
     if (!formData.companyName) newErrors.companyName = '회사명을 입력해주세요';
-    if (!formData.phone) newErrors.phone = '전화번호를 입력해주세요';
+    // if (!formData.phone) newErrors.phone = '전화번호를 입력해주세요';
     if (!formData.accountType || formData.accountType === 'default') {
       newErrors.accountType = '계정 유형을 선택해주세요';
     }
@@ -114,11 +118,43 @@ const SignupPage: React.FC = () => {
     return Object.keys(newErrors).length === 0;
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (validateForm()) {
-      // TODO: 회원가입 로직 구현
-      console.log('Signup attempt:', formData);
+    setSuccessMessage('');
+    
+    if (!validateForm()) {
+      return;
+    }
+
+    setIsLoading(true);
+
+    try {
+      // 백엔드 API 호출을 위한 데이터 변환
+      const signupData: SignupRequest = {
+        email: formData.email,
+        password: formData.password,
+        userType: formData.accountType.toUpperCase() as 'SELLER' | 'BUYER' | 'BROKER',
+        userName: `${formData.firstName} ${formData.lastName}`.trim(),
+      };
+
+      const response = await userApi.signup(signupData);
+      
+      setSuccessMessage('회원가입이 완료되었습니다! 로그인 페이지로 이동합니다.');
+      
+      // 2초 후 로그인 페이지로 이동
+      setTimeout(() => {
+        navigate('/login');
+      }, 2000);
+      
+    } catch (error: any) {
+      console.error('Signup error:', error);
+      if (error.response?.status === 400) {
+        setErrors({ email: '이미 존재하는 이메일입니다.' });
+      } else {
+        setErrors({ general: '회원가입 중 오류가 발생했습니다. 다시 시도해주세요.' });
+      }
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -177,6 +213,18 @@ const SignupPage: React.FC = () => {
                   {translations[currentLanguage].welcomeSubtitle}
                 </p>
               </div>
+
+              {successMessage && (
+                <div className="mb-4 p-3 bg-green-50 border border-green-200 rounded-lg">
+                  <p className="text-green-600 text-sm">{successMessage}</p>
+                </div>
+              )}
+
+              {errors.general && (
+                <div className="mb-4 p-3 bg-red-50 border border-red-200 rounded-lg">
+                  <p className="text-red-600 text-sm">{errors.general}</p>
+                </div>
+              )}
 
               <form onSubmit={handleSubmit} className="space-y-4">
                 <div className="grid grid-cols-2 gap-4">
@@ -296,7 +344,26 @@ const SignupPage: React.FC = () => {
                 </div>
 
                 <div>
-                  <label htmlFor="confirmPassword" className="block text-sm font-medium text-primary mb-1">{translations[currentLanguage].accountType}</label>
+                  <label htmlFor="confirmPassword" className="block text-sm font-medium text-primary mb-1">
+                    비밀번호 확인 *
+                  </label>
+                  <input
+                    type="password"
+                    id="confirmPassword"
+                    name="confirmPassword"
+                    value={formData.confirmPassword}
+                    onChange={handleInputChange}
+                    className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent transition-colors ${
+                      errors.confirmPassword ? 'border-error' : 'border-border'
+                    }`}
+                    placeholder="비밀번호를 다시 입력하세요"
+                    required
+                  />
+                  {errors.confirmPassword && <p className="text-error text-xs mt-1">{errors.confirmPassword}</p>}
+                </div>
+
+                <div>
+                  <label htmlFor="accountType" className="block text-sm font-medium text-primary mb-1">{translations[currentLanguage].accountType}</label>
                   <select
                     id="accountType"
                     name="accountType"
@@ -332,11 +399,12 @@ const SignupPage: React.FC = () => {
 
                 <button
                   type="submit"
-                  className="w-full bg-gradient-primary text-white py-4 px-6 rounded-lg font-semibold transition-colors duration-200 flex items-center justify-center gap-2"
+                  disabled={isLoading}
+                  className="w-full bg-gradient-primary text-white py-4 px-6 rounded-lg font-semibold transition-colors duration-200 flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
                   style={{ fontSize: '16px' }}
                 >
                   <UserPlus size={20} />
-                  {translations[currentLanguage].signUpButton}
+                  {isLoading ? '회원가입 중...' : translations[currentLanguage].signUpButton}
                 </button>
 
                 <div className="text-center">
