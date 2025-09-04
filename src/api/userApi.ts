@@ -51,4 +51,10 @@ export const userApi = {
     const response = await axiosInstance.get(`/users/check-email?email=${email}`);
     return response.data;
   },
+
+  // 로그아웃
+  logout: async (): Promise<void> => {
+    const response = await axiosInstance.post('/users/logout');
+    return response.data;
+  },
 };

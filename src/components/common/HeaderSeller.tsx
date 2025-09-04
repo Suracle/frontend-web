@@ -1,7 +1,8 @@
 import React from 'react';
 import { useLocation } from 'react-router-dom';
 import { Link } from 'react-router-dom';
-import { Building2, Store, ChevronRight } from 'lucide-react';
+import { Building2, Store, ChevronRight, LogOut } from 'lucide-react';
+import LogoutButton from './LogoutButton';
 
 const HeaderSeller: React.FC = () => {
   const location = useLocation();
@@ -36,6 +37,7 @@ const HeaderSeller: React.FC = () => {
             <Store size={16} />
             한국 판매자
           </div>
+          <LogoutButton />
         </div>
       </div>
     </header>

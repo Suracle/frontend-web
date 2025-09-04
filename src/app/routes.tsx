@@ -11,6 +11,7 @@ import ProductsBuyerPage from "@/pages/Buyer/ProductsBuyerPage";
 import RequestListPage from "@/pages/Broker/RequestListPage";
 import ReviewPage from "@/pages/Broker/ReviewPage";
 import UserTypeSelectionPage from "@/pages/UserTypeSelectionPage";
+import AppLayout from "@/components/layout/AppLayout";
 
 const router = createBrowserRouter([
   {
@@ -30,32 +31,50 @@ const router = createBrowserRouter([
     path: "/user-type-selection",
     element: <UserTypeSelectionPage />,
   },
-  // 판매자 페이지들
+  // 판매자 페이지들 (AppLayout 사용)
   {
-    path: "/seller/products",
-    element: <ProductsSellerPage />,
+    path: "/seller",
+    element: <AppLayout />,
+    children: [
+      {
+        path: "products",
+        element: <ProductsSellerPage />,
+      },
+      {
+        path: "products/:id",
+        element: <ProductDetailPage />,
+      },
+      {
+        path: "products/register",
+        element: <ProductRegistrationPage />,
+      },
+    ],
   },
+  // 구매자 페이지들 (AppLayout 사용)
   {
-    path: "/seller/products/:id",
-    element: <ProductDetailPage />,
+    path: "/buyer",
+    element: <AppLayout />,
+    children: [
+      {
+        path: "products",
+        element: <ProductsBuyerPage />,
+      },
+    ],
   },
+  // 브로커 페이지들 (AppLayout 사용)
   {
-    path: "/seller/products/register",
-    element: <ProductRegistrationPage />,
-  },
-  // 구매자 페이지들
-  {
-    path: "/buyer/products",
-    element: <ProductsBuyerPage />,
-  },
-  // 브로커 페이지들
-  {
-    path: "/broker/requests",
-    element: <RequestListPage />,
-  },
-  {
-    path: "/broker/review/:id",
-    element: <ReviewPage />,
+    path: "/broker",
+    element: <AppLayout />,
+    children: [
+      {
+        path: "requests",
+        element: <RequestListPage />,
+      },
+      {
+        path: "review/:id",
+        element: <ReviewPage />,
+      },
+    ],
   },
 ]);
 

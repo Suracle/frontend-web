@@ -78,7 +78,7 @@ const ProductsSellerPage: React.FC = () => {
   const [selectedStatus, setSelectedStatus] = useState('all');
 
   useEffect(() => {
-    console.log('ProductsSellerPage mounted');
+    // 컴포넌트 마운트 시 필요한 초기화 작업
   }, []);
 
   const filteredProducts = products.filter(product => {
