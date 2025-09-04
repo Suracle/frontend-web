@@ -2,9 +2,11 @@ import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { Globe, LogIn, Eye, EyeOff, Building2 } from 'lucide-react';
 import { userApi, type LoginRequest } from '../../api/userApi';
+import { useAuthStore } from '@/stores/authStore';
 
 const LoginPage: React.FC = () => {
   const navigate = useNavigate();
+  const { login } = useAuthStore();
   const [currentLanguage, setCurrentLanguage] = useState<'ko' | 'en'>('ko');
   const [formData, setFormData] = useState({
     email: '',
@@ -89,8 +91,8 @@ const LoginPage: React.FC = () => {
 
       const response = await userApi.login(loginData);
       
-      // 로그인 성공 시 사용자 정보 저장 (간단한 localStorage 사용)
-      localStorage.setItem('user', JSON.stringify(response));
+      // Zustand 스토어에 사용자 정보 저장
+      login(response);
       
       // 계정 유형에 따른 페이지 이동
       switch (response.userType) {
