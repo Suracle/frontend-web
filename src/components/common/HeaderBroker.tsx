@@ -1,5 +1,6 @@
 import React from 'react';
 import { Building2, Gavel } from 'lucide-react';
+import LogoutButton from './LogoutButton';
 
 const HeaderBroker: React.FC = () => {
   return (
@@ -17,6 +18,7 @@ const HeaderBroker: React.FC = () => {
             <Gavel size={16} />
             관세사
           </div>
+          <LogoutButton />
         </div>
       </div>
     </header>
