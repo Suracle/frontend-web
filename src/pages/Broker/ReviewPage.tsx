@@ -11,6 +11,7 @@ import {
   RequirementsAnalysisCard,
   PrecedentsAnalysisCard
 } from '@/components/common';
+import { requirementApi, type RequirementAnalysisResponse } from '@/api/requirementApi';
 
 interface ProductDetail {
   id: string;
@@ -32,6 +33,8 @@ const ReviewPage: React.FC = () => {
   const [showToast, setShowToast] = useState(false);
   const [toastMessage, setToastMessage] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [requirementAnalysis, setRequirementAnalysis] = useState<RequirementAnalysisResponse | null>(null);
+  const [requirementLoading, setRequirementLoading] = useState(false);
 
   // Mock product data
   const mockProducts: ProductDetail[] = [
@@ -92,11 +95,28 @@ const ReviewPage: React.FC = () => {
     }
   ];
 
+  // 요구사항 분석 조회
+  const fetchRequirementAnalysis = async (productId: string) => {
+    try {
+      setRequirementLoading(true);
+      // Mock product ID를 실제 DB ID로 변환 (실제로는 API에서 매핑 필요)
+      const dbProductId = parseInt(productId.replace('REV', '')) + 1; // REV001 -> 2, REV002 -> 3, etc.
+      const analysis = await requirementApi.getRequirementAnalysis(dbProductId);
+      setRequirementAnalysis(analysis);
+    } catch (error) {
+      console.error('Failed to fetch requirement analysis:', error);
+    } finally {
+      setRequirementLoading(false);
+    }
+  };
+
   useEffect(() => {
     // Load product data based on ID
     const foundProduct = mockProducts.find(p => p.id === id);
     if (foundProduct) {
       setProduct(foundProduct);
+      // 요구사항 분석 데이터 조회
+      fetchRequirementAnalysis(foundProduct.id);
     }
 
     // Load draft from localStorage
@@ -218,7 +238,11 @@ const ReviewPage: React.FC = () => {
         {/* AI Analysis Reports */}
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
           <TariffAnalysisCard product={product} />
-          <RequirementsAnalysisCard product={{...product, analysisComplete: true}} />
+          <RequirementsAnalysisCard product={{
+            analysisComplete: !!requirementAnalysis,
+            requirementAnalysis: requirementAnalysis || undefined,
+            loading: requirementLoading
+          }} />
           <PrecedentsAnalysisCard product={{...product, analysisComplete: true}} />
         </div>
 

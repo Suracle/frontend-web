@@ -5,6 +5,7 @@ import { ProductHeader, CommentsSection } from '@/components/seller';
 import { ProductInfoGrid, TariffAnalysisCard, RequirementsAnalysisCard, PrecedentsAnalysisCard } from '@/components/common';
 import { ArrowLeft } from 'lucide-react';
 import { productApi } from '@/api/productApi';
+import { requirementApi, type RequirementAnalysisResponse } from '@/api/requirementApi';
 import type { ProductResponse } from '@/types';
 
 const ProductDetailPage: React.FC = () => {
@@ -15,6 +16,8 @@ const ProductDetailPage: React.FC = () => {
   const [error, setError] = useState<string | null>(null);
   const [showToast, setShowToast] = useState(false);
   const [toastMessage, setToastMessage] = useState('');
+  const [requirementAnalysis, setRequirementAnalysis] = useState<RequirementAnalysisResponse | null>(null);
+  const [requirementLoading, setRequirementLoading] = useState(false);
 
   // 상품 상세 정보 조회
   const fetchProduct = async () => {
@@ -34,9 +37,28 @@ const ProductDetailPage: React.FC = () => {
     }
   };
 
+  // 요구사항 분석 조회
+  const fetchRequirementAnalysis = async (productId: number) => {
+    try {
+      setRequirementLoading(true);
+      const analysis = await requirementApi.getRequirementAnalysis(productId);
+      setRequirementAnalysis(analysis);
+    } catch (error) {
+      console.error('Failed to fetch requirement analysis:', error);
+    } finally {
+      setRequirementLoading(false);
+    }
+  };
+
   useEffect(() => {
     fetchProduct();
   }, [id]);
+
+  useEffect(() => {
+    if (product) {
+      fetchRequirementAnalysis(product.id);
+    }
+  }, [product]);
 
 
 
@@ -131,7 +153,9 @@ const ProductDetailPage: React.FC = () => {
             fobPrice: product.fobPrice
           }} />
           <RequirementsAnalysisCard product={{
-            analysisComplete: true
+            analysisComplete: !!requirementAnalysis,
+            requirementAnalysis: requirementAnalysis || undefined,
+            loading: requirementLoading
           }} />
           <PrecedentsAnalysisCard product={{
             analysisComplete: true
