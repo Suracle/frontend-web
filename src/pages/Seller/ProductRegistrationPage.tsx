@@ -2,26 +2,26 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { HeaderSeller, Chatbot } from '@/components/common';
 import { PlusCircle } from 'lucide-react';
+import { productApi } from '@/api/productApi';
+import type { ProductRequest } from '@/types';
 
 interface ProductFormData {
-  name: string;
+  productName: string;
   description: string;
-  category: string;
   price: number;
-  stock: number;
-  origin: string;
+  fobPrice: number;
+  originCountry: string;
   hsCode: string;
 }
 
 const ProductRegistrationPage: React.FC = () => {
   const navigate = useNavigate();
   const [formData, setFormData] = useState<ProductFormData>({
-    name: '',
+    productName: '',
     description: '',
-    category: '',
     price: 0,
-    stock: 0,
-    origin: '',
+    fobPrice: 0,
+    originCountry: '',
     hsCode: '',
   });
 
@@ -44,11 +44,11 @@ const ProductRegistrationPage: React.FC = () => {
   const validateForm = () => {
     const newErrors: Record<string, string> = {};
 
-    if (!formData.name) newErrors.name = '상품명을 입력해주세요';
+    if (!formData.productName) newErrors.productName = '상품명을 입력해주세요';
     if (!formData.description) newErrors.description = '상품 설명을 입력해주세요';
     if (formData.price <= 0) newErrors.price = '가격을 입력해주세요';
-    if (formData.stock < 0) newErrors.stock = 'FOB 가격을 입력해주세요';
-    if (!formData.origin) newErrors.origin = '원산지를 입력해주세요';
+    if (formData.fobPrice <= 0) newErrors.fobPrice = 'FOB 가격을 입력해주세요';
+    if (!formData.originCountry) newErrors.originCountry = '원산지를 입력해주세요';
     if (!formData.hsCode) newErrors.hsCode = 'HS코드를 입력해주세요';
 
     setErrors(newErrors);
@@ -62,22 +62,34 @@ const ProductRegistrationPage: React.FC = () => {
     setIsSubmitting(true);
     
     try {
-      // TODO: 실제 API 호출로 대체
-      console.log('Product registration:', formData);
+      // 임시 판매자 ID (실제로는 로그인된 사용자 정보에서 가져와야 함)
+      const sellerId = 1;
+      
+      const productRequest: ProductRequest = {
+        productName: formData.productName,
+        description: formData.description,
+        price: formData.price,
+        fobPrice: formData.fobPrice,
+        originCountry: formData.originCountry,
+        hsCode: formData.hsCode,
+        status: 'DRAFT',
+        isActive: true
+      };
+
+      await productApi.createProduct(productRequest, sellerId);
       
       // 성공 시 상품 목록 페이지로 이동
-      setTimeout(() => {
-        navigate('/seller/products');
-      }, 1000);
+      navigate('/seller/products');
     } catch (error) {
       console.error('Product registration failed:', error);
+      setErrors({ submit: '상품 등록에 실패했습니다. 다시 시도해주세요.' });
     } finally {
       setIsSubmitting(false);
     }
   };
 
   return (
-    <div className="min-h-screen bg-light-gray">
+    <div className="min-h-screen bg-gray-50">
       <HeaderSeller />
       
       <div className="flex">
@@ -107,22 +119,22 @@ const ProductRegistrationPage: React.FC = () => {
                 <div className="p-6">
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div>
-                      <label htmlFor="name" className="block text-sm font-medium text-text-primary mb-2">
+                      <label htmlFor="productName" className="block text-sm font-medium text-text-primary mb-2">
                         상품명 *
                       </label>
                       <input
                         type="text"
-                        id="name"
-                        name="name"
-                        value={formData.name}
+                        id="productName"
+                        name="productName"
+                        value={formData.productName}
                         onChange={handleInputChange}
                         className={`w-full px-4 py-3 border-2 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent transition-all ${
-                          errors.name ? 'border-error' : 'border-border'
+                          errors.productName ? 'border-error' : 'border-border'
                         }`}
-                        placeholder="예: 프리미엄 한국 인삼 엑기스"
+                        placeholder="예: Premium Vitamin C Serum"
                         required
                       />
-                      {errors.name && <p className="text-error text-xs mt-1">{errors.name}</p>}
+                      {errors.productName && <p className="text-error text-xs mt-1">{errors.productName}</p>}
                     </div>
 
                     <div>
@@ -147,43 +159,43 @@ const ProductRegistrationPage: React.FC = () => {
                     </div>
 
                     <div>
-                      <label htmlFor="stock" className="block text-sm font-medium text-text-primary mb-2">
+                      <label htmlFor="fobPrice" className="block text-sm font-medium text-text-primary mb-2">
                         FOB 가격 (USD) *
                       </label>
                       <input
                         type="number"
-                        id="stock"
-                        name="stock"
-                        value={formData.stock}
+                        id="fobPrice"
+                        name="fobPrice"
+                        value={formData.fobPrice}
                         onChange={handleInputChange}
                         min="0"
                         step="0.01"
                         className={`w-full px-4 py-3 border-2 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent transition-all ${
-                          errors.stock ? 'border-error' : 'border-border'
+                          errors.fobPrice ? 'border-error' : 'border-border'
                         }`}
                         placeholder="120.00"
                         required
                       />
-                      {errors.stock && <p className="text-error text-xs mt-1">{errors.stock}</p>}
+                      {errors.fobPrice && <p className="text-error text-xs mt-1">{errors.fobPrice}</p>}
                     </div>
 
                     <div>
-                      <label htmlFor="origin" className="block text-sm font-medium text-text-primary mb-2">
+                      <label htmlFor="originCountry" className="block text-sm font-medium text-text-primary mb-2">
                         원산지 *
                       </label>
                       <input
                         type="text"
-                        id="origin"
-                        name="origin"
-                        value={formData.origin}
+                        id="originCountry"
+                        name="originCountry"
+                        value={formData.originCountry}
                         onChange={handleInputChange}
                         className={`w-full px-4 py-3 border-2 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent transition-all ${
-                          errors.origin ? 'border-error' : 'border-border'
+                          errors.originCountry ? 'border-error' : 'border-border'
                         }`}
-                        placeholder="대한민국"
+                        placeholder="KOR"
                         required
                       />
-                      {errors.origin && <p className="text-error text-xs mt-1">{errors.origin}</p>}
+                      {errors.originCountry && <p className="text-error text-xs mt-1">{errors.originCountry}</p>}
                     </div>
 
                     <div className="md:col-span-2">
@@ -199,7 +211,7 @@ const ProductRegistrationPage: React.FC = () => {
                         className={`w-full px-4 py-3 border-2 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent transition-all resize-vertical ${
                           errors.description ? 'border-error' : 'border-border'
                         }`}
-                        placeholder="상품의 특징, 용도, 성분 등을 상세히 입력해주세요. 정확한 HS코드 분류를 위해 가능한 상세하게 작성해주세요."
+                        placeholder="상품의 특징, 용도, 성분 등을 상세히 영어로 입력해주세요. 정확한 HS코드 분류를 위해 가능한 상세하게 작성해주세요."
                         required
                       />
                       {errors.description && <p className="text-error text-xs mt-1">{errors.description}</p>}
@@ -207,7 +219,7 @@ const ProductRegistrationPage: React.FC = () => {
 
                     <div className="md:col-span-2">
                       <label htmlFor="hsCode" className="block text-sm font-medium text-text-primary mb-2">
-                        HS코드
+                        HS코드 *
                       </label>
                       <div className="flex gap-3">
                         <input
@@ -219,8 +231,8 @@ const ProductRegistrationPage: React.FC = () => {
                           className={`flex-1 px-4 py-3 border-2 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent transition-all ${
                             errors.hsCode ? 'border-error' : 'border-border'
                           }`}
-                          placeholder="AI가 추천하는 HS코드를 선택하거나 직접 입력하세요"
-                          readOnly
+                          placeholder="HS코드를 입력하세요 (예: 3304.10.00.00)"
+                          required
                         />
                         <button 
                           type="button" 
@@ -239,6 +251,13 @@ const ProductRegistrationPage: React.FC = () => {
                   </div>
                 </div>
               </div>
+
+              {/* Error Message */}
+              {errors.submit && (
+                <div className="bg-red-50 border border-red-200 rounded-lg p-4 text-red-600 text-sm">
+                  {errors.submit}
+                </div>
+              )}
 
               {/* Form Actions */}
               <div className="flex gap-4 justify-end pt-6 border-t border-border">

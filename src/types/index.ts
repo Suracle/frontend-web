@@ -7,36 +7,88 @@ export interface User {
   lastName: string;
   companyName: string;
   phone: string;
-  role: 'seller' | 'buyer' | 'admin';
+  role: 'SELLER' | 'BUYER' | 'BROKER';
   createdAt: string;
   updatedAt: string;
 }
 
 export interface Product {
-  id: string;
-  name: string;
+  id: number;
+  sellerId: number;
+  sellerName: string;
+  productId: string;
+  productName: string;
   description: string;
-  category: string;
   price: number;
-  stock: number;
-  status: 'active' | 'inactive' | 'pending';
-  images: string[];
-  sellerId: string;
+  fobPrice: number;
+  originCountry: string;
+  hsCode: string;
+  status: 'DRAFT' | 'PENDING_REVIEW' | 'APPROVED' | 'REJECTED';
+  isActive: boolean;
   createdAt: string;
   updatedAt: string;
 }
 
-export interface Order {
-  id: string;
+export interface ProductRequest {
+  productName: string;
+  description: string;
+  price: number;
+  fobPrice: number;
+  originCountry: string;
+  hsCode: string;
+  status: 'DRAFT' | 'PENDING_REVIEW' | 'APPROVED' | 'REJECTED';
+  isActive: boolean;
+}
+
+export interface ProductResponse {
+  id: number;
+  sellerId: number;
+  sellerName: string;
   productId: string;
-  buyerId: string;
-  sellerId: string;
-  quantity: number;
-  totalPrice: number;
-  status: 'pending' | 'confirmed' | 'shipped' | 'delivered' | 'cancelled';
+  productName: string;
+  description: string;
+  price: number;
+  fobPrice: number;
+  originCountry: string;
+  hsCode: string;
+  status: 'DRAFT' | 'PENDING_REVIEW' | 'APPROVED' | 'REJECTED';
+  isActive: boolean;
   createdAt: string;
   updatedAt: string;
 }
+
+export interface ProductListResponse {
+  id: number;
+  sellerId: number;
+  sellerName: string;
+  productId: string;
+  productName: string;
+  price: number;
+  fobPrice: number;
+  originCountry: string;
+  hsCode: string;
+  status: 'DRAFT' | 'PENDING_REVIEW' | 'APPROVED' | 'REJECTED';
+  isActive: boolean;
+  createdAt: string;
+}
+
+export interface PaginatedResponse<T> {
+  content: T[];
+  pageable: {
+    pageNumber: number;
+    pageSize: number;
+    sort: {
+      sorted: boolean;
+      unsorted: boolean;
+    };
+  };
+  totalElements: number;
+  totalPages: number;
+  last: boolean;
+  first: boolean;
+  numberOfElements: number;
+}
+
 
 export interface ApiResponse<T> {
   success: boolean;
