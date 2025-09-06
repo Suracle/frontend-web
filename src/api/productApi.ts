@@ -6,6 +6,16 @@ import type {
   PaginatedResponse 
 } from '../types';
 
+// Precedents 타입 정의 (data.sql 구조에 맞게 수정)
+export interface PrecedentsResponse {
+  similarProducts: string[];
+  approvalRate: number;
+  commonIssues: string[];
+  successFactors: string[];
+  confidenceScore: number;
+  isValid: boolean;
+}
+
 // 상품 API 함수들
 export const productApi = {
   // 상품 등록
@@ -79,5 +89,16 @@ export const productApi = {
       params
     });
     return response.data;
+  },
+
+  // 상품의 판례 분석 결과 조회
+  getProductPrecedents: async (productId: string): Promise<PrecedentsResponse> => {
+    try {
+      const response = await axiosInstance.get(`/products/${productId}/precedents`);
+      return response.data;
+    } catch (error) {
+      console.error('Failed to get product precedents:', error);
+      throw error;
+    }
   }
 };
