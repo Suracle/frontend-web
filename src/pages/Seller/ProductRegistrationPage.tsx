@@ -3,6 +3,8 @@ import { useNavigate } from 'react-router-dom';
 import { HeaderSeller, Chatbot } from '@/components/common';
 import { PlusCircle } from 'lucide-react';
 import { productApi } from '@/api/productApi';
+import { useAuthStore } from '@/stores/authStore';
+import { HsCodeAnalysis } from '@/components/seller';
 import type { ProductRequest } from '@/types';
 
 interface ProductFormData {
@@ -16,6 +18,7 @@ interface ProductFormData {
 
 const ProductRegistrationPage: React.FC = () => {
   const navigate = useNavigate();
+  const { user } = useAuthStore();
   const [formData, setFormData] = useState<ProductFormData>({
     productName: '',
     description: '',
@@ -27,6 +30,7 @@ const ProductRegistrationPage: React.FC = () => {
 
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [showHsCodeAnalysis, setShowHsCodeAnalysis] = useState(false);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
@@ -55,15 +59,29 @@ const ProductRegistrationPage: React.FC = () => {
     return Object.keys(newErrors).length === 0;
   };
 
+  const handleHsCodeSelected = (hsCode: string) => {
+    setFormData(prev => ({
+      ...prev,
+      hsCode: hsCode
+    }));
+    setShowHsCodeAnalysis(false);
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!validateForm()) return;
 
+    // 로그인된 사용자 확인
+    if (!user?.id) {
+      setErrors({ submit: '로그인이 필요합니다.' });
+      return;
+    }
+
     setIsSubmitting(true);
     
     try {
-      // 임시 판매자 ID (실제로는 로그인된 사용자 정보에서 가져와야 함)
-      const sellerId = 1;
+      // 로그인된 사용자의 ID 사용
+      const sellerId = user.id;
       
       const productRequest: ProductRequest = {
         productName: formData.productName,
@@ -236,14 +254,11 @@ const ProductRegistrationPage: React.FC = () => {
                         />
                         <button 
                           type="button" 
-                          className="px-6 py-3 bg-blue-500 text-white rounded-lg font-semibold hover:bg-blue-600 transition-colors flex items-center gap-2"
-                          onClick={() => {
-                            // TODO: HS코드 확인 로직 구현
-                            console.log('HS코드 확인');
-                          }}
+                          className="px-6 py-3 bg-gradient-primary to-secondary text-white rounded-lg font-semibold hover:transform hover:-translate-y-0.5 hover:shadow-lg transition-all duration-300 flex items-center gap-2"
+                          onClick={() => setShowHsCodeAnalysis(!showHsCodeAnalysis)}
                         >
                           <i className="fas fa-magic"></i>
-                          HS코드 확인
+                          {showHsCodeAnalysis ? '분석 숨기기' : 'HS코드 확인'}
                         </button>
                       </div>
                       {errors.hsCode && <p className="text-error text-xs mt-1">{errors.hsCode}</p>}
@@ -251,6 +266,15 @@ const ProductRegistrationPage: React.FC = () => {
                   </div>
                 </div>
               </div>
+
+              {/* HS코드 분석 섹션 */}
+              {showHsCodeAnalysis && (
+                <HsCodeAnalysis
+                  productName={formData.productName}
+                  productDescription={formData.description}
+                  onHsCodeSelected={(hsCode, description) => handleHsCodeSelected(hsCode)}
+                />
+              )}
 
               {/* Error Message */}
               {errors.submit && (
@@ -289,6 +313,7 @@ const ProductRegistrationPage: React.FC = () => {
           welcomeMessage="AI 어시스턴트가 상품 등록을 도와드립니다.\n궁금한 점이 있으시면 언제든 문의하세요!"
         />
       </div>
+
     </div>
   );
 };
