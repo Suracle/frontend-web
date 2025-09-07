@@ -38,42 +38,57 @@ const PrecedentsAnalysisCard: React.FC<PrecedentsAnalysisCardProps> = ({ product
         ) : analysisComplete && precedentsAnalysis ? (
           <div className="text-text-primary leading-relaxed mb-4">
             <div className="mb-4">
-              <strong>승인률:</strong> {(precedentsAnalysis.approvalRate * 100).toFixed(1)}%
-              <span className="ml-2 text-sm text-text-secondary">
-                (신뢰도: {(precedentsAnalysis.confidenceScore * 100).toFixed(1)}%)
-              </span>
+              <strong>신뢰도:</strong> {(precedentsAnalysis.confidenceScore * 100).toFixed(1)}%
             </div>
             
-            {precedentsAnalysis.similarProducts && precedentsAnalysis.similarProducts.length > 0 && (
+            {precedentsAnalysis.successCases && precedentsAnalysis.successCases.length > 0 && (
               <div className="mb-4">
-                <strong>유사 상품:</strong>
+                <strong className="text-green-600">성공 사례:</strong>
                 <ul className="list-disc list-inside ml-2 mt-1">
-                  {precedentsAnalysis.similarProducts.map((product, index) => (
-                    <li key={index} className="text-sm">{product}</li>
+                  {precedentsAnalysis.successCases.map((successCase, index) => (
+                    <li key={index} className="text-sm text-green-700">{successCase}</li>
                   ))}
                 </ul>
               </div>
             )}
             
-            {precedentsAnalysis.commonIssues && precedentsAnalysis.commonIssues.length > 0 && (
+            {precedentsAnalysis.failureCases && precedentsAnalysis.failureCases.length > 0 && (
               <div className="mb-4">
-                <strong>주요 이슈:</strong>
+                <strong className="text-red-600">실패 사례:</strong>
                 <ul className="list-disc list-inside ml-2 mt-1">
-                  {precedentsAnalysis.commonIssues.map((issue, index) => (
-                    <li key={index} className="text-sm text-red-600">{issue}</li>
+                  {precedentsAnalysis.failureCases.map((failureCase, index) => (
+                    <li key={index} className="text-sm text-red-700">{failureCase}</li>
                   ))}
                 </ul>
               </div>
             )}
             
-            {precedentsAnalysis.successFactors && precedentsAnalysis.successFactors.length > 0 && (
+            {precedentsAnalysis.actionableInsights && precedentsAnalysis.actionableInsights.length > 0 && (
               <div className="mb-4">
-                <strong>성공 요인:</strong>
+                <strong className="text-blue-600">실행 가능한 인사이트:</strong>
                 <ul className="list-disc list-inside ml-2 mt-1">
-                  {precedentsAnalysis.successFactors.map((factor, index) => (
-                    <li key={index} className="text-sm text-green-600">{factor}</li>
+                  {precedentsAnalysis.actionableInsights.map((insight, index) => (
+                    <li key={index} className="text-sm text-blue-700">{insight}</li>
                   ))}
                 </ul>
+              </div>
+            )}
+            
+            {precedentsAnalysis.riskFactors && precedentsAnalysis.riskFactors.length > 0 && (
+              <div className="mb-4">
+                <strong className="text-orange-600">위험 요소:</strong>
+                <ul className="list-disc list-inside ml-2 mt-1">
+                  {precedentsAnalysis.riskFactors.map((risk, index) => (
+                    <li key={index} className="text-sm text-orange-700">{risk}</li>
+                  ))}
+                </ul>
+              </div>
+            )}
+            
+            {precedentsAnalysis.recommendedAction && (
+              <div className="mb-4 p-3 bg-blue-50 rounded-lg">
+                <strong className="text-blue-800">권장 조치:</strong>
+                <p className="text-sm text-blue-700 mt-1">{precedentsAnalysis.recommendedAction}</p>
               </div>
             )}
           </div>
