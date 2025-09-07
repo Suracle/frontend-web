@@ -4,8 +4,9 @@ import { HeaderSeller, ToastNotification, Chatbot } from '@/components/common';
 import { ProductHeader, CommentsSection } from '@/components/seller';
 import { ProductInfoGrid, TariffAnalysisCard, RequirementsAnalysisCard, PrecedentsAnalysisCard } from '@/components/common';
 import { ArrowLeft } from 'lucide-react';
-import { productApi } from '@/api/productApi';
+
 import { requirementApi, type RequirementAnalysisResponse } from '@/api/requirementApi';
+import { productApi, type PrecedentsResponse } from '@/api/productApi';
 import type { ProductResponse } from '@/types';
 
 const ProductDetailPage: React.FC = () => {
@@ -18,6 +19,8 @@ const ProductDetailPage: React.FC = () => {
   const [toastMessage, setToastMessage] = useState('');
   const [requirementAnalysis, setRequirementAnalysis] = useState<RequirementAnalysisResponse | null>(null);
   const [requirementLoading, setRequirementLoading] = useState(false);
+  const [precedentsAnalysis, setPrecedentsAnalysis] = useState<PrecedentsResponse | null>(null);
+  const [precedentsLoading, setPrecedentsLoading] = useState(false);
 
   // 상품 상세 정보 조회
   const fetchProduct = async () => {
@@ -50,6 +53,19 @@ const ProductDetailPage: React.FC = () => {
     }
   };
 
+  // 판례 분석 조회
+  const fetchPrecedentsAnalysis = async (productId: string) => {
+    try {
+      setPrecedentsLoading(true);
+      console.log("Fetching precedents for productId:", productId); const analysis = await productApi.getProductPrecedents(productId); console.log("Precedents analysis result:", analysis);
+      setPrecedentsAnalysis(analysis);
+    } catch (error) {
+      console.error('Failed to fetch precedents analysis:', error);
+    } finally {
+      setPrecedentsLoading(false);
+    }
+  };
+
   useEffect(() => {
     fetchProduct();
   }, [id]);
@@ -57,10 +73,9 @@ const ProductDetailPage: React.FC = () => {
   useEffect(() => {
     if (product) {
       fetchRequirementAnalysis(product.id);
+      fetchPrecedentsAnalysis(product.productId);
     }
   }, [product]);
-
-
 
   const requestReview = () => {
     if (!product) return;
@@ -134,7 +149,9 @@ const ProductDetailPage: React.FC = () => {
             status: product.status === 'DRAFT' ? 'not_reviewed' : 
                    product.status === 'PENDING_REVIEW' ? 'pending' :
                    product.status === 'APPROVED' ? 'approved' : 'rejected',
-            analysisComplete: true
+            analysisComplete: !!precedentsAnalysis,
+            precedentsAnalysis: precedentsAnalysis || undefined,
+            loading: precedentsLoading
           }}
           onRequestReview={requestReview} 
         />
@@ -160,7 +177,9 @@ const ProductDetailPage: React.FC = () => {
             loading: requirementLoading
           }} />
           <PrecedentsAnalysisCard product={{
-            analysisComplete: true
+            analysisComplete: !!precedentsAnalysis,
+            precedentsAnalysis: precedentsAnalysis || undefined,
+            loading: precedentsLoading
           }} />
         </div>
         
