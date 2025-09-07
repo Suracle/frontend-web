@@ -13,6 +13,7 @@ export { default as Chatbot } from './Chatbot';
 // Product Information Components
 export { default as ProductInfoCard } from './ProductInfoCard';
 export { default as ProductInfoGrid } from './ProductInfoGrid';
+export { default as ProductDescriptionCard } from './ProductDescriptionCard';
 
 // Analysis Components
 export { default as TariffAnalysisCard } from './TariffAnalysisCard';

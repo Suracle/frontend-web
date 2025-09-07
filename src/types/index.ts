@@ -1,7 +1,7 @@
 // 공통 타입 정의
 
 export interface User {
-  id: string;
+  id: number;
   email: string;
   firstName: string;
   lastName: string;
@@ -51,6 +51,7 @@ export interface ProductResponse {
   fobPrice: number;
   originCountry: string;
   hsCode: string;
+  hsCodeDescription: string;
   status: 'DRAFT' | 'PENDING_REVIEW' | 'APPROVED' | 'REJECTED';
   isActive: boolean;
   createdAt: string;
