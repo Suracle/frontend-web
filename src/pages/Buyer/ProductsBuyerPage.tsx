@@ -205,7 +205,7 @@ const ProductsBuyerPage: React.FC = () => {
         {!loading && !error && (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 mb-12">
             {products.map((product) => (
-            <div key={product.id} className="bg-white rounded-2xl overflow-hidden shadow-sm hover:shadow-lg transition-all duration-300 hover:-translate-y-1">
+            <div key={product.id} className="bg-white rounded-2xl overflow-hidden shadow-sm hover:shadow-lg transition-all duration-300 hover:-translate-y-1 flex flex-col h-full">
               {/* Product Image */}
               <div className="relative bg-gradient-secondary from-accent-cream to-secondary flex items-center justify-center" style={{ height: '200px' }}>
                 <div className="text-white opacity-70">
@@ -214,13 +214,10 @@ const ProductsBuyerPage: React.FC = () => {
                 <div className="absolute top-3 left-3 bg-white bg-opacity-90 text-primary px-2 py-1 rounded-xl text-xs font-semibold">
                   {product.originCountry}
                 </div>
-                <div className="absolute top-3 right-3 bg-white bg-opacity-90 text-primary px-2 py-1 rounded-xl text-xs font-semibold">
-                  {product.status}
-                </div>
               </div>
 
               {/* Product Info */}
-              <div className="p-5">
+              <div className="p-5 flex flex-col flex-1">
                 <h3 className="text-lg font-semibold text-text-primary mb-2 line-clamp-2">
                   {product.productName}
                 </h3>
@@ -237,29 +234,30 @@ const ProductsBuyerPage: React.FC = () => {
                   HS Code: {product.hsCode} | Seller: {product.sellerName}
                 </div>
 
-                {/* Quantity Section */}
-                <div className="mb-4">
-                  <div className="text-sm font-medium text-text-primary mb-2">Quantity</div>
-                  <div className="flex gap-2">
-                    <input
-                      type="number"
-                      min="1"
-                      value={quantities[product.productId] || 1}
-                      onChange={(e) => handleQuantityChange(product.productId, parseInt(e.target.value) || 1)}
-                      className="flex-1 px-3 py-2 border-2 border-gray-300 rounded-lg focus-ring-primary"
-                    />
-                    <button
-                      onClick={() => calculateTariff(product.productId)}
-                      className="px-4 py-2 bg-primary text-white rounded-lg hover:bg-secondary transition-colors flex items-center gap-2"
-                    >
-                      <Calculator size={16} />
-                    </button>
-                  </div>
-                </div>
+                 {/* Quantity Section */}
+                 <div className="mb-4">
+                   <div className="text-sm font-medium text-text-primary mb-2">Quantity</div>
+                   <div className="space-y-2 sm:space-y-0 sm:flex sm:gap-2">
+                     <input
+                       type="number"
+                       min="1"
+                       value={quantities[product.productId] || 1}
+                       onChange={(e) => handleQuantityChange(product.productId, parseInt(e.target.value) || 1)}
+                       className="w-full px-3 py-2 border-2 border-gray-300 rounded-lg focus-ring-primary"
+                     />
+                     <button
+                       onClick={() => calculateTariff(product.productId)}
+                       className="w-full sm:w-auto px-4 py-2 bg-primary text-white rounded-lg hover:bg-secondary transition-colors flex items-center justify-center gap-2 text-sm"
+                     >
+                       <Calculator size={16} />
+                       <span className="hidden xs:inline">Calculate</span>
+                     </button>
+                   </div>
+                 </div>
 
                 {/* Tariff Info */}
                 {tariffInfo[product.productId]?.show && (
-                  <div className="bg-accent-cream p-3 rounded-lg">
+                  <div className="bg-accent-cream p-3 rounded-lg mt-auto">
                     <div className="text-primary font-semibold mb-1">
                       Estimated Tariff: {formatPrice(tariffInfo[product.productId].tariffAmount)}
                     </div>

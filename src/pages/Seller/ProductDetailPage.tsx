@@ -160,7 +160,9 @@ const ProductDetailPage: React.FC = () => {
           price: product.price,
           fobPrice: product.fobPrice,
           origin: product.originCountry,
-          hsCode: product.hsCode
+          hsCode: product.hsCode,
+          hsCodeDescription: product.hsCodeDescription,
+          description: product.description
         }} />
         
         {/* AI Analysis Cards */}
