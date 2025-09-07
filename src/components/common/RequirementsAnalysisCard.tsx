@@ -10,87 +10,7 @@ interface RequirementsAnalysisCardProps {
   };
 }
 
-interface ExternalLink {
-  title: string;
-  url: string;
-}
 
-const getExternalLinks = (hsCode: string): ExternalLink[] => {
-  const links: ExternalLink[] = [
-    {
-      title: 'FDA 화장품 규정 확인',
-      url: 'https://www.fda.gov/cosmetics'
-    }
-  ];
-
-  // HS 코드에 따른 추가 링크
-  if (hsCode.startsWith('3304')) {
-    // 화장품 관련
-    links.push({
-      title: 'FDA 색소 첨가물 규정',
-      url: 'https://www.fda.gov/industry/color-additive-inventories'
-    });
-  } else if (hsCode.startsWith('3305')) {
-    // 헤어케어 제품
-    links.push({
-      title: 'FDA 헤어케어 제품 가이드',
-      url: 'https://www.fda.gov/cosmetics/cosmetic-products/hair-care-products'
-    });
-  } else if (hsCode.startsWith('3307')) {
-    // 향수
-    links.push({
-      title: 'FDA 향수 규정',
-      url: 'https://www.fda.gov/cosmetics/cosmetic-products/fragrances-cosmetics'
-    });
-  }
-
-  // 일반적인 추가 링크
-  links.push(
-    {
-      title: 'MoCRA (화장품 규정 현대화법)',
-      url: 'https://www.fda.gov/cosmetics/cosmetics-laws-regulations/modernization-cosmetics-regulation-act-mcra'
-    },
-    {
-      title: 'CPSC 화장품 안전 규정',
-      url: 'https://www.cpsc.gov/Business--Manufacturing/Business-Education/Business-Guidance/Cosmetics'
-    }
-  );
-
-  return links;
-};
-
-const getProductClassification = (hsCode: string): string => {
-  if (hsCode.startsWith('3304')) {
-    return '화장품 (Cosmetics)로 분류';
-  } else if (hsCode.startsWith('3305')) {
-    return '헤어케어 제품 (Hair Care Products)로 분류';
-  } else if (hsCode.startsWith('3307')) {
-    return '향수 (Perfumes)로 분류';
-  }
-  return '건강기능식품 (Dietary Supplement)로 분류';
-};
-
-const getLabelingRequirements = (hsCode: string): string => {
-  if (hsCode.startsWith('3304')) {
-    return '화장품 라벨링 규정 및 성분 표시 규정 준수';
-  } else if (hsCode.startsWith('3305')) {
-    return '헤어케어 제품 라벨링 및 성분 공개 규정 준수';
-  } else if (hsCode.startsWith('3307')) {
-    return '향수 라벨링 및 알레르기 성분 표시 규정 준수';
-  }
-  return '영양성분표 및 건강기능 표시 규정 준수';
-};
-
-const getAdditionalTests = (hsCode: string): string => {
-  if (hsCode.startsWith('3304')) {
-    return '중금속, 농약 잔류물질, 색소 안전성 검사 권장';
-  } else if (hsCode.startsWith('3305')) {
-    return 'pH, 중금속, 농약 잔류물질 검사 권장';
-  } else if (hsCode.startsWith('3307')) {
-    return '알레르기 성분, 중금속, 농약 잔류물질 검사 권장';
-  }
-  return '중금속, 농약 잔류물질 검사 권장';
-};
 
 const RequirementsAnalysisCard: React.FC<RequirementsAnalysisCardProps> = ({ product }) => {
   return (
@@ -123,129 +43,140 @@ const RequirementsAnalysisCard: React.FC<RequirementsAnalysisCardProps> = ({ pro
               </div>
             </div>
 
-            {/* 상세 설명 (원본 내용 복원) */}
-            <div className="text-text-primary leading-relaxed mb-4">
-              <strong>FDA 규정 준수 필요</strong><br/><br/>
-              1. <strong>시설 등록:</strong> FDA에 제조시설 등록 필요<br/>
-              2. <strong>제품 분류:</strong> {getProductClassification(product.requirementAnalysis.hsCode)}<br/>
-              3. <strong>라벨링 요건:</strong> {getLabelingRequirements(product.requirementAnalysis.hsCode)}<br/>
-              4. <strong>Good Manufacturing Practice (GMP)</strong> 인증 필요<br/><br/>
-              <strong>추가 검사:</strong> {getAdditionalTests(product.requirementAnalysis.hsCode)}
-            </div>
-
-            {/* API 데이터 기반 체크리스트 */}
-            <div className="space-y-3">
-              <h4 className="font-semibold text-text-primary mb-3">상세 요구사항 체크리스트</h4>
-              
-              <div className="space-y-2">
-                <div className="flex items-center gap-2">
-                  {product.requirementAnalysis.fdaRegistration ? (
-                    <CheckCircle size={16} className="text-green-600" />
-                  ) : (
-                    <XCircle size={16} className="text-red-600" />
-                  )}
-                  <span className="text-sm">FDA 등록</span>
-                </div>
-                
-                <div className="flex items-center gap-2">
-                  {product.requirementAnalysis.cosmeticFacilityRegistration ? (
-                    <CheckCircle size={16} className="text-green-600" />
-                  ) : (
-                    <XCircle size={16} className="text-red-600" />
-                  )}
-                  <span className="text-sm">화장품 시설 등록</span>
-                </div>
-                
-                <div className="flex items-center gap-2">
-                  {product.requirementAnalysis.ingredientSafety ? (
-                    <CheckCircle size={16} className="text-green-600" />
-                  ) : (
-                    <XCircle size={16} className="text-red-600" />
-                  )}
-                  <span className="text-sm">원료 안전성</span>
-                </div>
-                
-                <div className="flex items-center gap-2">
-                  {product.requirementAnalysis.labelingCompliance ? (
-                    <CheckCircle size={16} className="text-green-600" />
-                  ) : (
-                    <XCircle size={16} className="text-red-600" />
-                  )}
-                  <span className="text-sm">라벨링 규정 준수</span>
-                </div>
-                
-                {product.requirementAnalysis.colorAdditiveApproval && (
-                  <div className="flex items-center gap-2">
-                    <CheckCircle size={16} className="text-green-600" />
-                    <span className="text-sm">색소 첨가물 승인</span>
-                  </div>
-                )}
-                
-                {product.requirementAnalysis.safetyTesting && (
-                  <div className="flex items-center gap-2">
-                    <CheckCircle size={16} className="text-green-600" />
-                    <span className="text-sm">안전성 테스트</span>
-                  </div>
-                )}
-                
-                {product.requirementAnalysis.phTesting && (
-                  <div className="flex items-center gap-2">
-                    <CheckCircle size={16} className="text-green-600" />
-                    <span className="text-sm">pH 테스트</span>
-                  </div>
-                )}
-                
-                {product.requirementAnalysis.sensitiveSkinTesting && (
-                  <div className="flex items-center gap-2">
-                    <CheckCircle size={16} className="text-green-600" />
-                    <span className="text-sm">민감성 피부 테스트</span>
-                  </div>
-                )}
-                
-                {product.requirementAnalysis.uvSafety && (
-                  <div className="flex items-center gap-2">
-                    <CheckCircle size={16} className="text-green-600" />
-                    <span className="text-sm">UV 안전성</span>
-                  </div>
-                )}
-                
-                {product.requirementAnalysis.sulfateFreeClaim && (
-                  <div className="flex items-center gap-2">
-                    <CheckCircle size={16} className="text-green-600" />
-                    <span className="text-sm">Sulfate Free 주장</span>
-                  </div>
-                )}
-              </div>
-            </div>
-
-            {/* 추가 문서 요구사항 */}
-            {product.requirementAnalysis.additionalDocs.length > 0 && (
-              <div className="pt-4 border-t border-gray-200">
-                <h4 className="font-semibold text-text-primary mb-3">추가 필요 문서</h4>
-                <div className="flex flex-wrap gap-2">
-                  {product.requirementAnalysis.additionalDocs.map((doc, index) => (
-                    <span key={index} className="px-3 py-1 bg-blue-100 text-blue-800 text-sm rounded-full">
-                      {doc}
-                    </span>
+            {/* 핵심 조치사항 */}
+            {(product.requirementAnalysis.criticalActions?.length ?? 0) > 0 && (
+              <div className="mb-6">
+                <h4 className="font-semibold text-text-primary mb-3 flex items-center gap-2">
+                  <AlertCircle size={16} className="text-red-500" />
+                  핵심 조치사항
+                </h4>
+                <div className="space-y-2">
+                  {(product.requirementAnalysis.criticalActions ?? []).map((action, index) => (
+                    <div key={index} className="flex items-start gap-2 p-3 bg-red-50 border-l-4 border-red-400 rounded-r-lg">
+                      <div className="w-2 h-2 bg-red-500 rounded-full mt-2 flex-shrink-0"></div>
+                      <span className="text-sm text-red-800">{action}</span>
+                    </div>
                   ))}
                 </div>
               </div>
             )}
 
+            {/* 브로커 거절 사유 */}
+            {product.requirementAnalysis.brokerRejectionReason && (
+              <div className="mb-6">
+                <h4 className="font-semibold text-text-primary mb-3 flex items-center gap-2">
+                  <XCircle size={16} className="text-red-500" />
+                  브로커 거절 사유
+                </h4>
+                <div className="p-4 bg-red-50 border border-red-200 rounded-lg">
+                  <p className="text-sm text-red-800">{product.requirementAnalysis.brokerRejectionReason}</p>
+                </div>
+              </div>
+            )}
+
+            {/* 필수 문서 목록 */}
+            {(product.requirementAnalysis.requiredDocuments?.length ?? 0) > 0 && (
+              <div className="mb-6">
+                <h4 className="font-semibold text-text-primary mb-3 flex items-center gap-2">
+                  <FileText size={16} className="text-blue-500" />
+                  필수 문서 목록
+                </h4>
+                <div className="space-y-2">
+                  {(product.requirementAnalysis.requiredDocuments ?? []).map((doc, index) => (
+                    <div key={index} className="flex items-start gap-2 p-3 bg-blue-50 border-l-4 border-blue-400 rounded-r-lg">
+                      <CheckCircle size={16} className="text-blue-600 mt-0.5 flex-shrink-0" />
+                      <span className="text-sm text-blue-800">{doc}</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* 준수 단계 */}
+            {(product.requirementAnalysis.complianceSteps?.length ?? 0) > 0 && (
+              <div className="mb-6">
+                <h4 className="font-semibold text-text-primary mb-3 flex items-center gap-2">
+                  <CheckCircle size={16} className="text-green-500" />
+                  준수 단계
+                </h4>
+                <div className="space-y-3">
+                  {(product.requirementAnalysis.complianceSteps ?? []).map((step, index) => (
+                    <div key={index} className="flex items-start gap-3 p-3 bg-green-50 border border-green-200 rounded-lg">
+                      <div className="w-6 h-6 bg-green-500 text-white text-xs font-bold rounded-full flex items-center justify-center flex-shrink-0">
+                        {index + 1}
+                      </div>
+                      <span className="text-sm text-green-800">{step}</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* 타임라인 및 기타 정보 */}
+            <div className="space-y-4">
+              {product.requirementAnalysis.timeline && (
+                <div className="p-3 bg-yellow-50 border border-yellow-200 rounded-lg">
+                  <h5 className="font-medium text-yellow-800 mb-1">예상 소요 시간</h5>
+                  <p className="text-sm text-yellow-700">{product.requirementAnalysis.timeline}</p>
+                </div>
+              )}
+
+              {product.requirementAnalysis.criticalDeadline && (
+                <div className="p-3 bg-red-50 border border-red-200 rounded-lg">
+                  <h5 className="font-medium text-red-800 mb-1">중요 마감일</h5>
+                  <p className="text-sm text-red-700">{product.requirementAnalysis.criticalDeadline}</p>
+                </div>
+              )}
+
+              {product.requirementAnalysis.qualityStandards && (
+                <div className="p-3 bg-blue-50 border border-blue-200 rounded-lg">
+                  <h5 className="font-medium text-blue-800 mb-1">품질 기준</h5>
+                  <p className="text-sm text-blue-700">{product.requirementAnalysis.qualityStandards}</p>
+                </div>
+              )}
+
+              {product.requirementAnalysis.coldChainRequirement && (
+                <div className="p-3 bg-purple-50 border border-purple-200 rounded-lg">
+                  <h5 className="font-medium text-purple-800 mb-1">냉장 유통 요구사항</h5>
+                  <p className="text-sm text-purple-700">{product.requirementAnalysis.coldChainRequirement}</p>
+                </div>
+              )}
+
+              {product.requirementAnalysis.criticalWarning && (
+                <div className="p-3 bg-red-100 border-2 border-red-300 rounded-lg">
+                  <h5 className="font-medium text-red-900 mb-1 flex items-center gap-2">
+                    <AlertCircle size={16} />
+                    중요 경고
+                  </h5>
+                  <p className="text-sm text-red-800">{product.requirementAnalysis.criticalWarning}</p>
+                </div>
+              )}
+
+              {product.requirementAnalysis.pendingAnalysis && (
+                <div className="p-3 bg-orange-50 border border-orange-200 rounded-lg">
+                  <h5 className="font-medium text-orange-800 mb-1">진행 중인 분석</h5>
+                  <p className="text-sm text-orange-700">{product.requirementAnalysis.pendingAnalysis}</p>
+                </div>
+              )}
+            </div>
+
             {/* 외부 링크 */}
             <div className="pt-4 border-t border-gray-200">
-              {getExternalLinks(product.requirementAnalysis.hsCode).map((link, index) => (
-                <a 
-                  key={index}
-                  href={link.url} 
-                  target="_blank" 
-                  rel="noopener noreferrer"
-                  className="text-blue-600 text-sm flex items-center gap-2 hover:underline mb-2"
-                >
-                  <ExternalLink size={14} />
-                  {link.title}
-                </a>
-              ))}
+              <h4 className="font-semibold text-text-primary mb-3">관련 링크</h4>
+              <div className="space-y-2">
+                {(product.requirementAnalysis.sources ?? []).map((source, index) => (
+                  <a 
+                    key={index}
+                    href={source} 
+                    target="_blank" 
+                    rel="noopener noreferrer"
+                    className="text-blue-600 text-sm flex items-center gap-2 hover:underline"
+                  >
+                    <ExternalLink size={14} />
+                    {source}
+                  </a>
+                ))}
+              </div>
             </div>
           </div>
         ) : (
