@@ -10,9 +10,10 @@ interface ReviewProductHeaderProps {
     requestDate: string;
     status: 'pending' | 'approved' | 'rejected';
   };
+  onStatusChange?: (newStatus: 'PENDING' | 'APPROVED' | 'REJECTED') => void;
 }
 
-const ReviewProductHeader: React.FC<ReviewProductHeaderProps> = ({ product }) => {
+const ReviewProductHeader: React.FC<ReviewProductHeaderProps> = ({ product, onStatusChange }) => {
   // 상태별 배지 설정
   const getStatusBadge = () => {
     switch (product.status) {
@@ -45,6 +46,26 @@ const ReviewProductHeader: React.FC<ReviewProductHeaderProps> = ({ product }) =>
 
   const statusBadge = getStatusBadge();
 
+  // 클릭/우클릭 이벤트 핸들러
+  const handleStatusClick = (event: React.MouseEvent) => {
+    if (!onStatusChange) return;
+
+    if (event.type === 'click') {
+      // 클릭: 승인/반려 취소 (PENDING으로 변경)
+      if (product.status !== 'pending') {
+        onStatusChange('PENDING');
+      }
+    } else if (event.type === 'contextmenu') {
+      // 우클릭: 승인/반려 토글
+      event.preventDefault();
+      if (product.status === 'approved') {
+        onStatusChange('REJECTED');
+      } else if (product.status === 'rejected') {
+        onStatusChange('APPROVED');
+      }
+    }
+  };
+
   return (
     <div className="bg-white rounded-2xl shadow-lg p-8 mb-8">
       <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-6">
@@ -57,7 +78,12 @@ const ReviewProductHeader: React.FC<ReviewProductHeaderProps> = ({ product }) =>
           </div>
         </div>
         <div className="flex flex-col items-end gap-2">
-          <div className={`${statusBadge.bgColor} text-white px-4 py-2 rounded-xl text-sm font-semibold flex items-center gap-2`}>
+          <div 
+            className={`${statusBadge.bgColor} text-white px-4 py-2 rounded-xl text-sm font-semibold flex items-center gap-2 cursor-pointer hover:opacity-80 transition-opacity select-none`}
+            onClick={handleStatusClick}
+            onContextMenu={handleStatusClick}
+            title={product.status !== 'pending' ? '클릭: 취소, 우클릭: 토글' : ''}
+          >
             {statusBadge.icon}
             {statusBadge.text}
           </div>

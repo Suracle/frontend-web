@@ -16,6 +16,18 @@ export interface PrecedentsResponse {
   isValid: boolean;
 }
 
+// 관세 분석 타입 정의
+export interface TariffAnalysisResponse {
+  hsCode: string;
+  tariffRate: number;
+  ftaRate: number;
+  estimatedDuty: number;
+  fobPrice: number;
+  description: string;
+  confidenceScore: number;
+  lastUpdated: string;
+}
+
 // 상품 API 함수들
 export const productApi = {
   // 상품 등록
@@ -98,6 +110,28 @@ export const productApi = {
       return response.data;
     } catch (error) {
       console.error('Failed to get product precedents:', error);
+      throw error;
+    }
+  },
+
+  // 상품의 관세 분석 결과 조회
+  getProductTariffAnalysis: async (productId: string): Promise<TariffAnalysisResponse> => {
+    try {
+      const response = await axiosInstance.get(`/products/${productId}/tariff-analysis`);
+      return response.data;
+    } catch (error) {
+      console.error('Failed to get product tariff analysis:', error);
+      throw error;
+    }
+  },
+
+  // 상품 ID 매핑 조회 (브로커 리뷰용)
+  getProductIdMapping: async (reviewProductId: number): Promise<{ productId: string }> => {
+    try {
+      const response = await axiosInstance.get(`/products/id-mapping/${reviewProductId}`);
+      return { productId: response.data.productId };
+    } catch (error) {
+      console.error('Failed to get product ID mapping:', error);
       throw error;
     }
   }

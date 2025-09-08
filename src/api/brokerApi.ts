@@ -1,4 +1,5 @@
 import axiosInstance from './axiosinstance';
+import type { TariffAnalysisResponse, PrecedentsResponse } from './productApi';
 
 // 타입 정의
 export interface BrokerReviewRequest {
@@ -231,5 +232,27 @@ export const productApi = {
       params: { productName, page, size }
     });
     return response.data;
+  },
+
+  // 상품의 관세 분석 결과 조회
+  getProductTariffAnalysis: async (productId: string): Promise<TariffAnalysisResponse> => {
+    try {
+      const response = await axiosInstance.get(`/products/${productId}/tariff-analysis`);
+      return response.data;
+    } catch (error) {
+      console.error('Failed to get product tariff analysis:', error);
+      throw error;
+    }
+  },
+
+  // 상품의 판례 분석 결과 조회
+  getProductPrecedents: async (productId: string): Promise<PrecedentsResponse> => {
+    try {
+      const response = await axiosInstance.get(`/products/${productId}/precedents`);
+      return response.data;
+    } catch (error) {
+      console.error('Failed to get product precedents:', error);
+      throw error;
+    }
   }
 };

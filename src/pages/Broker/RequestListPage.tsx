@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { HeaderBroker } from '@/components/common';
-import { Clock, CheckCircle, Store, Eye, Check, X, Loader2 } from 'lucide-react';
+import { Package, Clock, CheckCircle, Store, Eye, Check, X, Loader2 } from 'lucide-react';
 import { brokerApi, productApi } from '@/api/brokerApi';
 import { useAuthStore } from '@/stores/authStore';
 
@@ -25,14 +25,34 @@ const RequestListPage: React.FC = () => {
   const [reviews, setReviews] = useState<ProductReviewRequest[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [currentFilter] = useState('all');
+  const [currentFilter, setCurrentFilter] = useState<'all' | 'pending' | 'approved' | 'rejected'>('all');
   const [stats, setStats] = useState({
     pendingCount: 0,
-    completedCount: 0
+    approvedCount: 0,
+    rejectedCount: 0
   });
 
   // 로그인한 사용자의 brokerId 사용
   const brokerId = user?.id;
+
+  // 필터링된 리뷰 데이터 반환
+  const getFilteredReviews = () => {
+    switch (currentFilter) {
+      case 'pending':
+        return reviews.filter(review => review.reviewStatus === 'PENDING');
+      case 'approved':
+        return reviews.filter(review => review.reviewStatus === 'APPROVED');
+      case 'rejected':
+        return reviews.filter(review => review.reviewStatus === 'REJECTED');
+      default:
+        return reviews;
+    }
+  };
+
+  // 필터 변경 핸들러
+  const handleFilterChange = (filter: 'all' | 'pending' | 'approved' | 'rejected') => {
+    setCurrentFilter(filter);
+  };
 
   // 데이터 로드 함수
   const loadReviews = async () => {
@@ -106,11 +126,13 @@ const RequestListPage: React.FC = () => {
       
       // 통계 업데이트
       const pendingCount = allReviews.content.filter(r => r.reviewStatus === 'PENDING').length;
-      const completedCount = allReviews.content.filter(r => r.reviewStatus === 'APPROVED' || r.reviewStatus === 'REJECTED').length;
+      const approvedCount = allReviews.content.filter(r => r.reviewStatus === 'APPROVED').length;
+      const rejectedCount = allReviews.content.filter(r => r.reviewStatus === 'REJECTED').length;
       
       setStats({
         pendingCount,
-        completedCount
+        approvedCount,
+        rejectedCount
       });
       
     } catch (error) {
@@ -176,20 +198,6 @@ const RequestListPage: React.FC = () => {
     }
   };
 
-  const filteredReviews = reviews.filter(review => {
-    if (currentFilter === 'urgent') {
-      return review.priority === 'high';
-    } else if (currentFilter === 'normal') {
-      return review.priority === 'normal';
-    } else if (currentFilter === 'pending') {
-      return review.reviewStatus === 'PENDING';
-    } else if (currentFilter === 'approved') {
-      return review.reviewStatus === 'APPROVED';
-    } else if (currentFilter === 'rejected') {
-      return review.reviewStatus === 'REJECTED';
-    }
-    return true; // 'all' - 모든 상태 표시
-  });
 
   // const handleReviewProduct = (reviewId: string) => {
   //   // Navigate to detailed review page
@@ -241,24 +249,78 @@ const RequestListPage: React.FC = () => {
         </div>
 
         {/* Stats Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-5 mb-8">
-          <div className="bg-white rounded-xl p-6 shadow-sm text-center">
-            <div className="w-12 h-12 bg-orange-100 rounded-xl flex items-center justify-center mx-auto mb-3">
-              <Clock size={24} className="text-orange-500" />
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-5 mb-8">
+          {/* 전체 카드 */}
+          <button
+            onClick={() => handleFilterChange('all')}
+            className={`bg-white rounded-xl p-4 md:p-6 shadow-sm text-center transition-all duration-200 hover:shadow-md ${
+              currentFilter === 'all' 
+                ? 'ring-2 ring-blue-500 bg-blue-50' 
+                : 'hover:bg-gray-50'
+            }`}
+          >
+            <div className="w-10 h-10 md:w-12 md:h-12 bg-blue-100 rounded-xl flex items-center justify-center mx-auto mb-2 md:mb-3">
+              <Package size={20} className="text-blue-600" />
             </div>
-            <div className="text-3xl font-bold text-gray-800 mb-1">
-              {loading ? <Loader2 size={24} className="animate-spin mx-auto" /> : stats.pendingCount}
+            <div className="text-2xl md:text-3xl font-bold text-gray-800 mb-1">
+              {loading ? <Loader2 size={20} className="animate-spin mx-auto" /> : reviews.length}
             </div>
-            <div className="text-sm text-gray-600">대기중인 요청</div>
-          </div>
+            <div className="text-xs md:text-sm text-gray-600">전체 요청</div>
+          </button>
+
+          {/* 대기중 카드 */}
+          <button
+            onClick={() => handleFilterChange('pending')}
+            className={`bg-white rounded-xl p-4 md:p-6 shadow-sm text-center transition-all duration-200 hover:shadow-md ${
+              currentFilter === 'pending' 
+                ? 'ring-2 ring-orange-500 bg-orange-50' 
+                : 'hover:bg-gray-50'
+            }`}
+          >
+            <div className="w-10 h-10 md:w-12 md:h-12 bg-orange-100 rounded-xl flex items-center justify-center mx-auto mb-2 md:mb-3">
+              <Clock size={20} className="text-orange-500" />
+            </div>
+            <div className="text-2xl md:text-3xl font-bold text-gray-800 mb-1">
+              {loading ? <Loader2 size={20} className="animate-spin mx-auto" /> : stats.pendingCount}
+            </div>
+            <div className="text-xs md:text-sm text-gray-600">대기중</div>
+          </button>
           
-          <div className="bg-white rounded-xl p-6 shadow-sm text-center">
-            <div className="w-12 h-12 bg-green-100 rounded-xl flex items-center justify-center mx-auto mb-3">
-              <CheckCircle size={24} className="text-green-500" />
+          {/* 승인 카드 */}
+          <button
+            onClick={() => handleFilterChange('approved')}
+            className={`bg-white rounded-xl p-4 md:p-6 shadow-sm text-center transition-all duration-200 hover:shadow-md ${
+              currentFilter === 'approved' 
+                ? 'ring-2 ring-green-500 bg-green-50' 
+                : 'hover:bg-gray-50'
+            }`}
+          >
+            <div className="w-10 h-10 md:w-12 md:h-12 bg-green-100 rounded-xl flex items-center justify-center mx-auto mb-2 md:mb-3">
+              <CheckCircle size={20} className="text-green-500" />
             </div>
-            <div className="text-3xl font-bold text-gray-800 mb-1">{stats.completedCount}</div>
-            <div className="text-sm text-gray-600">이번 주 완료</div>
-          </div>
+            <div className="text-2xl md:text-3xl font-bold text-gray-800 mb-1">
+              {loading ? <Loader2 size={20} className="animate-spin mx-auto" /> : stats.approvedCount}
+            </div>
+            <div className="text-xs md:text-sm text-gray-600">승인</div>
+          </button>
+
+          {/* 반려 카드 */}
+          <button
+            onClick={() => handleFilterChange('rejected')}
+            className={`bg-white rounded-xl p-4 md:p-6 shadow-sm text-center transition-all duration-200 hover:shadow-md ${
+              currentFilter === 'rejected' 
+                ? 'ring-2 ring-red-500 bg-red-50' 
+                : 'hover:bg-gray-50'
+            }`}
+          >
+            <div className="w-10 h-10 md:w-12 md:h-12 bg-red-100 rounded-xl flex items-center justify-center mx-auto mb-2 md:mb-3">
+              <X size={20} className="text-red-500" />
+            </div>
+            <div className="text-2xl md:text-3xl font-bold text-gray-800 mb-1">
+              {loading ? <Loader2 size={20} className="animate-spin mx-auto" /> : stats.rejectedCount}
+            </div>
+            <div className="text-xs md:text-sm text-gray-600">반려</div>
+          </button>
         </div>
 
         {/* Review List */}
@@ -281,14 +343,14 @@ const RequestListPage: React.FC = () => {
                 다시 시도
               </button>
             </div>
-          ) : filteredReviews.length === 0 ? (
+          ) : getFilteredReviews().length === 0 ? (
             <div className="text-center py-16 text-gray-500">
               <div className="text-6xl mb-4 opacity-30">📦</div>
               <h3 className="text-lg mb-2">검토 요청이 없습니다</h3>
-              <p>현재 {currentFilter === 'urgent' ? '긴급' : currentFilter === 'normal' ? '일반' : ''} 검토 요청이 없습니다.</p>
+              <p>현재 {currentFilter === 'pending' ? '대기중인' : currentFilter === 'approved' ? '승인된' : currentFilter === 'rejected' ? '반려된' : '전체'} 검토 요청이 없습니다.</p>
             </div>
           ) : (
-            filteredReviews.map((review) => (
+            getFilteredReviews().map((review) => (
               <div key={review.id} className="bg-white rounded-xl shadow-sm overflow-hidden hover:shadow-md transition-shadow">
                 {/* Review Header */}
                 <div className="p-6 border-b border-gray-200 flex justify-between items-start">
