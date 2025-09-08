@@ -1,31 +1,44 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { MessageCircle, Bot, Send, X } from 'lucide-react';
-
-interface Message {
-  id: string;
-  type: 'user' | 'bot';
-  content: string;
-  timestamp: Date;
-}
+import { MessageCircle, Bot, Send, X, AlertCircle } from 'lucide-react';
+import { useChatStore } from '../../stores/chatStore';
+import { useAuthStore } from '../../stores/authStore';
+import type { ChatSessionType, MessageSenderType, MessageType } from '../../types';
 
 interface ChatbotProps {
   title?: string;
   placeholder?: string;
   welcomeMessage?: string;
   className?: string;
+  sessionType?: ChatSessionType;
 }
 
 const Chatbot: React.FC<ChatbotProps> = ({
   title = "AI 무역 어시스턴트",
   placeholder = "메시지를 입력하세요...",
   welcomeMessage = "AI 어시스턴트가 상품 등록을 도와드립니다.\n궁금한 점이 있으시면 언제든 문의하세요!",
-  className = ""
+  className = "",
+  sessionType = "SELLER_PRODUCT_INQUIRY"
 }) => {
   const [isOpen, setIsOpen] = useState(false);
-  const [messages, setMessages] = useState<Message[]>([]);
   const [inputValue, setInputValue] = useState('');
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
+  
+  // Store에서 상태와 액션 가져오기
+  const { user } = useAuthStore();
+  const { 
+    currentSession, 
+    messages, 
+    isLoading, 
+    error,
+    createSession,
+    sendMessage,
+    generateAiResponse,
+    getMessages,
+    clearError
+  } = useChatStore();
+  
+  const messagesRef = useRef(messages);
 
   // 메시지 목록 자동 스크롤
   const scrollToBottom = () => {
@@ -33,87 +46,109 @@ const Chatbot: React.FC<ChatbotProps> = ({
   };
 
   useEffect(() => {
+    messagesRef.current = messages;
+    console.log('Messages updated:', { count: messages.length, messages });
     scrollToBottom();
   }, [messages]);
 
   // 챗봇 열기/닫기
-  const toggleChatbot = () => {
+  const toggleChatbot = async () => {
     setIsOpen(!isOpen);
-    if (!isOpen && messages.length === 0) {
-      // 첫 번째 열기 시 환영 메시지 추가
-      console.log('Adding welcome message');
-      addBotMessage(welcomeMessage);
+    
+    if (!isOpen) {
+      // 챗봇을 열 때 세션이 없으면 새로 생성
+      if (!currentSession && user) {
+        try {
+          await createSession(
+            user.id, 
+            sessionType, 
+            user.preferredLanguage || 'ko'
+          );
+        } catch (error) {
+          console.error('Failed to create session:', error);
+        }
+      }
+      
+      // 기존 메시지가 있으면 로드
+      if (currentSession && messages.length === 0) {
+        try {
+          await getMessages(currentSession.id);
+        } catch (error) {
+          console.error('Failed to load messages:', error);
+        }
+      }
     }
-  };
-
-  // 봇 메시지 추가
-  const addBotMessage = (content: string) => {
-    console.log('addBotMessage called with:', content);
-    const newMessage: Message = {
-      id: Date.now().toString(),
-      type: 'bot',
-      content,
-      timestamp: new Date()
-    };
-    console.log('New bot message:', newMessage);
-    setMessages(prev => {
-      const updated = [...prev, newMessage];
-      console.log('Updated messages array:', updated);
-      return updated;
-    });
-  };
-
-  // 사용자 메시지 추가
-  const addUserMessage = (content: string) => {
-    console.log('addUserMessage called with:', content);
-    const newMessage: Message = {
-      id: Date.now().toString(),
-      type: 'user',
-      content,
-      timestamp: new Date()
-    };
-    console.log('New user message:', newMessage);
-    setMessages(prev => {
-      const updated = [...prev, newMessage];
-      console.log('Updated messages array:', updated);
-      return updated;
-    });
   };
 
   // 메시지 전송
-  const sendMessage = () => {
-    console.log('sendMessage called, inputValue:', inputValue);
-    if (!inputValue.trim()) {
-      console.log('Input is empty, returning');
+  const handleSendMessage = async () => {
+    if (!inputValue.trim() || isLoading) {
+      console.log('Message send blocked:', { 
+        hasInput: !!inputValue.trim(), 
+        hasSession: !!currentSession, 
+        isLoading 
+      });
       return;
     }
 
-    console.log('Adding user message:', inputValue);
-    addUserMessage(inputValue);
-    
-    // 간단한 봇 응답 (실제로는 API 호출)
-    setTimeout(() => {
-      const responses = [
-        "네, 도움이 필요하시군요! 어떤 부분에 대해 궁금하신가요?",
-        "상품 등록에 대해 질문이 있으시면 언제든 말씀해주세요.",
-        "HS코드나 관세 관련 정보가 필요하시면 도와드릴 수 있습니다.",
-        "더 자세한 정보가 필요하시면 구체적으로 말씀해주세요."
-      ];
-      const randomResponse = responses[Math.floor(Math.random() * responses.length)];
-      console.log('Adding bot response:', randomResponse);
-      addBotMessage(randomResponse);
-    }, 1000);
+    // 세션이 없으면 먼저 생성
+    if (!currentSession && user) {
+      console.log('Creating session first...');
+      try {
+        await createSession(
+          user.id, 
+          sessionType, 
+          user.preferredLanguage || 'ko'
+        );
+        // 세션 생성 후 잠시 대기하여 상태 업데이트 완료 보장
+        await new Promise(resolve => setTimeout(resolve, 200));
+      } catch (error) {
+        console.error('Failed to create session:', error);
+        return;
+      }
+    }
 
+    // 세션 생성 후 다시 확인
+    if (!currentSession) {
+      console.error('Session creation failed');
+      return;
+    }
+
+    const userMessage = inputValue.trim();
     setInputValue('');
+
+    console.log('Sending message:', { userMessage, sessionId: currentSession.id });
+
+    try {
+      // 사용자 메시지 전송
+      console.log('Sending user message...', { userMessage, sessionId: currentSession.id });
+      await sendMessage(
+        currentSession.id,
+        'USER' as MessageSenderType,
+        userMessage,
+        'TEXT' as MessageType
+      );
+      console.log('User message sent, current messages after send:', messagesRef.current);
+
+      // AI 응답 생성
+      console.log('Generating AI response...');
+      await generateAiResponse(currentSession.id, userMessage);
+      console.log('AI response generated, current messages after AI:', messagesRef.current);
+
+      // 메시지 목록 다시 조회하여 최신 상태 동기화
+      console.log('Refreshing messages...');
+      await getMessages(currentSession.id);
+      console.log('Messages refreshed, final messages:', messagesRef.current);
+    } catch (error) {
+      console.error('Failed to send message:', error);
+    }
   };
 
   // 엔터키로 메시지 전송
   const handleKeyDown = (e: React.KeyboardEvent) => {
-    console.log('Key pressed:', e.key);
     if (e.key === 'Enter' && !e.shiftKey) {
       e.preventDefault();
-      console.log('Enter key pressed, calling sendMessage');
-      sendMessage();
+      handleSendMessage();
     }
   };
 
@@ -159,41 +194,56 @@ const Chatbot: React.FC<ChatbotProps> = ({
 
         {/* 메시지 영역 */}
         <div className="flex-1 p-5 overflow-y-auto flex flex-col gap-4">
+          {error && (
+            <div className="flex items-center gap-2 p-3 bg-red-50 border border-red-200 rounded-lg text-red-700 text-sm">
+              <AlertCircle size={16} />
+              <span>{error}</span>
+              <button
+                onClick={clearError}
+                className="ml-auto text-red-500 hover:text-red-700"
+              >
+                ✕
+              </button>
+            </div>
+          )}
+          
           {messages.length === 0 ? (
             <div className="flex flex-col items-center justify-center h-full text-center">
               <MessageCircle size={48} className="opacity-30 mb-4" />
-              <p className="text-text-secondary">
-                {formatMessage(welcomeMessage)}
-              </p>
+              <div className="text-text-secondary">
+                {welcomeMessage.split('\n').map((line, index) => (
+                  <div key={index}>
+                    {line}
+                    {index < welcomeMessage.split('\n').length - 1 && <br />}
+                  </div>
+                ))}
+              </div>
             </div>
           ) : (
-            messages.map((message) => {
-              console.log('Rendering message:', message);
-              return (
-                <div
-                  key={message.id}
-                  className={`flex flex-col max-w-[80%] ${
-                    message.type === 'user' ? 'self-end' : 'self-start'
-                  }`}
-                >
-                  <div className={`px-4 py-3 rounded-2xl text-sm leading-relaxed ${
-                    message.type === 'user' 
-                      ? 'bg-gradient-to-br from-primary to-secondary text-white' 
-                      : 'bg-gray-100 text-text-primary'
-                  }`}>
-                    {formatMessage(message.content)}
-                  </div>
-                  <div className={`text-xs text-text-secondary mt-1 ${
-                    message.type === 'user' ? 'text-right' : 'text-left'
-                  }`}>
-                    {message.timestamp.toLocaleTimeString('ko-KR', {
-                      hour: '2-digit',
-                      minute: '2-digit'
-                    })}
-                  </div>
+            messages.map((message) => (
+              <div
+                key={message.id}
+                className={`flex flex-col max-w-[80%] ${
+                  message.senderType === 'USER' ? 'self-end' : 'self-start'
+                }`}
+              >
+                <div className={`px-4 py-3 rounded-2xl text-sm leading-relaxed ${
+                  message.senderType === 'USER' 
+                    ? 'bg-gray-100 text-text-primary' 
+                    : 'bg-gray-100 text-text-primary'
+                }`}>
+                  {formatMessage(message.messageContent)}
                 </div>
-              );
-            })
+                <div className={`text-xs text-text-secondary mt-1 ${
+                  message.senderType === 'USER' ? 'text-right' : 'text-left'
+                }`}>
+                  {new Date(message.createdAt).toLocaleTimeString('ko-KR', {
+                    hour: '2-digit',
+                    minute: '2-digit'
+                  })}
+                </div>
+              </div>
+            ))
           )}
           <div ref={messagesEndRef} />
         </div>
@@ -210,15 +260,16 @@ const Chatbot: React.FC<ChatbotProps> = ({
             className="flex-1 px-4 py-3 border border-gray-300 rounded-3xl outline-none text-sm transition-colors focus:border-primary"
           />
           <button
-            onClick={() => {
-              console.log('Send button clicked');
-              sendMessage();
-            }}
-            disabled={!inputValue.trim()}
+            onClick={handleSendMessage}
+            disabled={!inputValue.trim() || isLoading || !currentSession}
             className="w-10 h-10 bg-primary border-none rounded-full text-white cursor-pointer flex items-center justify-center transition-all hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed"
             aria-label="메시지 전송"
           >
-            <Send size={16} />
+            {isLoading ? (
+              <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+            ) : (
+              <Send size={16} />
+            )}
           </button>
         </div>
       </div>
