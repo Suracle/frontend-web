@@ -227,9 +227,6 @@ const ProductsBuyerPage: React.FC = () => {
                 <div className="text-2xl font-bold text-primary mb-4">
                   {formatPrice(product.price)}
                 </div>
-                <div className="text-sm text-text-secondary mb-4">
-                  FOB Price: {formatPrice(product.fobPrice)}
-                </div>
                 <div className="text-xs text-text-secondary mb-4">
                   HS Code: {product.hsCode} | Seller: {product.sellerName}
                 </div>
