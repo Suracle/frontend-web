@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { HeaderBroker, ProductInfoCard, ToastNotification } from '@/components/common';
+import { HeaderBroker, ToastNotification } from '@/components/common';
 import { 
   ReviewProductHeader, 
   ReviewForm,
@@ -14,7 +14,8 @@ import {
   PrecedentsAnalysisCard
 } from '@/components/common';
 import { requirementApi, type RequirementAnalysisResponse } from '@/api/requirementApi';
-import { brokerApi, productApi, type BrokerReviewResponse } from '@/api/brokerApi';
+import { brokerApi, type BrokerReviewResponse } from '@/api/brokerApi';
+import { productApi, type PrecedentsResponse } from '@/api/productApi';
 
 interface ProductDetail {
   id: number;
@@ -30,6 +31,18 @@ interface ProductDetail {
   description: string;
 }
 
+/**
+ * ReviewPage - 브로커 리뷰 페이지 (기존)
+ * 
+ * 이 페이지는 기존에 있던 리뷰 페이지로, URL 경로가 /broker/review/:id 입니다.
+ * 새로운 ReviewDetailPage(/broker/review-detail/:id)와 구분됩니다.
+ * 
+ * 주요 기능:
+ * - 리뷰 데이터 로드 및 표시
+ * - AI 분석 카드들 (관세, 요구사항, 판례)
+ * - 리뷰 작성 및 제출
+ * - 키보드 단축키 지원
+ */
 const ReviewPage: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
@@ -40,6 +53,8 @@ const ReviewPage: React.FC = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [requirementAnalysis, setRequirementAnalysis] = useState<RequirementAnalysisResponse | null>(null);
   const [requirementLoading, setRequirementLoading] = useState(false);
+  const [precedentsAnalysis, setPrecedentsAnalysis] = useState<PrecedentsResponse | null>(null);
+  const [precedentsLoading, setPrecedentsLoading] = useState(false);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [review, setReview] = useState<BrokerReviewResponse | null>(null);
@@ -62,13 +77,27 @@ const ReviewPage: React.FC = () => {
       // 상품 정보 조회 - reviewData.productId는 숫자이므로 API로 매핑 정보를 조회
       console.log('Product ID from review:', reviewData.productId, 'Type:', typeof reviewData.productId);
       
-      // 상품 ID 매핑 조회
-      const mappingData = await productApi.getProductIdMapping(reviewData.productId);
-      console.log('Product ID mapping:', mappingData);
-      
-      // 매핑된 productId로 상품 상세 정보 조회
-      const productData = await productApi.getProductById(mappingData.productId);
-      console.log('Product data loaded:', productData);
+      let productData;
+      try {
+        // 상품 ID 매핑 조회 시도
+        const mappingData = await productApi.getProductIdMapping(reviewData.productId);
+        console.log('Product ID mapping:', mappingData);
+        
+        // 매핑된 productId로 상품 상세 정보 조회
+        productData = await productApi.getProductById(mappingData.productId);
+        console.log('Product data loaded:', productData);
+      } catch (mappingError) {
+        console.warn('Product ID mapping failed, trying direct approach:', mappingError);
+        
+        // 매핑 API가 실패한 경우, productId를 직접 사용하여 상품 정보 조회 시도
+        try {
+          productData = await productApi.getProductById(reviewData.productId.toString());
+          console.log('Product data loaded directly:', productData);
+        } catch (directError) {
+          console.error('Direct product fetch also failed:', directError);
+          throw new Error('상품 정보를 불러올 수 없습니다. 상품 ID: ' + reviewData.productId);
+        }
+      }
       
       // ProductDetail 형태로 변환
       const productDetail: ProductDetail = {
@@ -101,18 +130,40 @@ const ReviewPage: React.FC = () => {
   };
 
   // 요구사항 분석 조회
-  const fetchRequirementAnalysis = async (productId: string) => {
+  const fetchRequirementAnalysis = async (productId: number) => {
     try {
       setRequirementLoading(true);
-      // TODO: 실제로는 API에서 productId 매핑을 제공해야 함
-      // 현재는 임시로 하드코딩된 매핑 사용
-      const dbProductId = parseInt(productId.replace('REV', '')) + 1; // REV001 -> 2, REV002 -> 3, etc.
-      const analysis = await requirementApi.getRequirementAnalysis(dbProductId);
+      
+      // 기존 requirementApi 사용
+      const analysis = await requirementApi.getRequirementAnalysis(productId);
       setRequirementAnalysis(analysis);
     } catch (error) {
       console.error('Failed to fetch requirement analysis:', error);
+      // 에러가 발생해도 UI는 계속 동작하도록 함
     } finally {
       setRequirementLoading(false);
+    }
+  };
+
+
+  // 판례 분석 조회
+  const fetchPrecedentsAnalysis = async (productId: number) => {
+    try {
+      setPrecedentsLoading(true);
+      console.log("Fetching precedents for productId:", productId); 
+      
+      // 먼저 productId 매핑을 통해 문자열 productId 조회
+      const mapping = await productApi.getProductIdMapping(productId);
+      const stringProductId = mapping.productId;
+      
+      // 기존 getProductPrecedents API 사용
+      const analysis = await productApi.getProductPrecedents(stringProductId);
+      console.log("Precedents analysis result:", analysis);
+      setPrecedentsAnalysis(analysis);
+    } catch (error) {
+      console.error('Failed to fetch precedents analysis:', error);
+    } finally {
+      setPrecedentsLoading(false);
     }
   };
 
@@ -122,8 +173,10 @@ const ReviewPage: React.FC = () => {
 
   useEffect(() => {
     if (product) {
-      // 요구사항 분석 데이터 조회
-      fetchRequirementAnalysis(product.productId);
+      // broker_reviews.product_id는 숫자이므로 그대로 사용
+      const numericProductId = product.id;
+      fetchRequirementAnalysis(numericProductId);
+      fetchPrecedentsAnalysis(numericProductId);
     }
   }, [product]);
 
@@ -275,15 +328,22 @@ const ReviewPage: React.FC = () => {
           hsCodeDescription: 'HS Code Description', // 실제로는 API에서 가져와야 함
         }} />
 
-        {/* AI Analysis Reports */}
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
-          <TariffAnalysisCard product={product} />
+        {/* AI Analysis Cards */}
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-5 mb-8">
+          <TariffAnalysisCard product={{
+            hsCode: product.hsCode,
+            fobPrice: product.price
+          }} />
           <RequirementsAnalysisCard product={{
             analysisComplete: !!requirementAnalysis,
             requirementAnalysis: requirementAnalysis || undefined,
             loading: requirementLoading
           }} />
-          <PrecedentsAnalysisCard product={{...product, analysisComplete: true}} />
+          <PrecedentsAnalysisCard product={{
+            analysisComplete: !!precedentsAnalysis,
+            precedentsAnalysis: precedentsAnalysis || undefined,
+            loading: precedentsLoading
+          }} />
         </div>
 
         {/* Comments Section */}
