@@ -124,3 +124,64 @@ export interface ProductFilters {
   minPrice?: number;
   maxPrice?: number;
 }
+
+
+// 채팅 관련 타입 정의
+export type ChatSessionType = 'SELLER_PRODUCT_INQUIRY' | 'BUYER_PURCHASE_INQUIRY';
+export type ChatSessionStatus = 'ACTIVE' | 'COMPLETED' | 'FAILED';
+export type MessageSenderType = 'USER' | 'AI';
+export type MessageType = 'TEXT' | 'BUTTON' | 'BUTTON_GROUP';
+
+export interface ChatSessionRequest {
+  userId: number;
+  sessionType: ChatSessionType;
+  language: string;
+  sessionData?: string;
+}
+
+export interface ChatSessionResponse {
+  id: number;
+  userId: number;
+  userName: string;
+  sessionType: ChatSessionType;
+  language: string;
+  status: ChatSessionStatus;
+  sessionData?: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface ChatMessageRequest {
+  sessionId: number;
+  senderType: MessageSenderType;
+  messageContent: string;
+  messageType: MessageType;
+  metadata?: string;
+}
+
+export interface ChatMessageResponse {
+  id: number;
+  sessionId: number;
+  senderType: MessageSenderType;
+  messageContent: string;
+  messageType: MessageType;
+  metadata?: string;
+  createdAt: string;
+}
+
+export interface ChatMessagesPageResponse {
+  content: ChatMessageResponse[];
+  pageable: {
+    pageNumber: number;
+    pageSize: number;
+    sort: {
+      sorted: boolean;
+      unsorted: boolean;
+    };
+  };
+  totalElements: number;
+  totalPages: number;
+  last: boolean;
+  first: boolean;
+  numberOfElements: number;
+}
