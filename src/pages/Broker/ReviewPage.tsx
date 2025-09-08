@@ -24,6 +24,7 @@ interface ProductDetail {
   fobPrice: number;
   origin: string;
   hsCode: string;
+  hsCodeDescription?: string;
   sellerName: string;
   requestDate: string;
   status: 'pending' | 'approved' | 'rejected';
@@ -107,6 +108,7 @@ const ReviewPage: React.FC = () => {
         fobPrice: productData.fobPrice,
         origin: productData.originCountry,
         hsCode: productData.hsCode,
+        hsCodeDescription: productData.hsCodeDescription,
         sellerName: productData.sellerName,
         requestDate: new Date(reviewData.requestedAt).toLocaleString('ko-KR'),
         status: reviewData.reviewStatus.toLowerCase() as 'pending' | 'approved' | 'rejected',
@@ -186,6 +188,52 @@ const ReviewPage: React.FC = () => {
       localStorage.setItem(`review_draft_${id}`, reviewComment);
     }
   }, [reviewComment, id]);
+
+  // 상태 변경 핸들러 (승인/반려 취소)
+  const handleStatusChange = async (newStatus: 'PENDING' | 'APPROVED' | 'REJECTED') => {
+    if (!review) return;
+
+    const currentStatus = review.reviewStatus;
+    const productName = product?.name || '상품';
+
+    // 취소 가능한 상태인지 확인
+    if (currentStatus === 'PENDING') {
+      alert('대기중인 상태는 취소할 수 없습니다.');
+      return;
+    }
+
+    const action = newStatus === 'PENDING' ? '취소' : 
+                   newStatus === 'APPROVED' ? '승인' : '반려';
+    const currentAction = currentStatus === 'APPROVED' ? '승인' : '반려';
+
+    if (confirm(`${productName}의 ${currentAction}을 ${action}하시겠습니까?`)) {
+      try {
+        setIsSubmitting(true);
+        
+        const comment = newStatus === 'PENDING' ? 
+          `${currentAction}이 취소되었습니다.` : 
+          `상품이 ${action}되었습니다.`;
+
+        await brokerApi.updateReviewStatus(review.id, newStatus, comment);
+        
+        setToastMessage(`${currentAction}이 ${action}되었습니다.`);
+        setShowToast(true);
+        
+        // 데이터 새로고침
+        await loadReviewData();
+        
+        setTimeout(() => {
+          setShowToast(false);
+        }, 2000);
+        
+      } catch (error) {
+        console.error('Failed to update review status:', error);
+        alert('상태 변경 중 오류가 발생했습니다.');
+      } finally {
+        setIsSubmitting(false);
+      }
+    }
+  };
 
 
 
@@ -320,12 +368,15 @@ const ReviewPage: React.FC = () => {
       
       <main className="max-w-6xl mx-auto px-5 py-8">
         {/* Product Header */}
-        <ReviewProductHeader product={product} />
+        <ReviewProductHeader 
+          product={product} 
+          onStatusChange={handleStatusChange}
+        />
 
         {/* Product Information Grid */}
         <ProductInfoGrid product={{
           ...product,
-          hsCodeDescription: 'HS Code Description', // 실제로는 API에서 가져와야 함
+          hsCodeDescription: product.hsCodeDescription || 'HS Code Description',
         }} />
 
         {/* AI Analysis Cards */}
