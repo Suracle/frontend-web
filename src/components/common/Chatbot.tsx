@@ -25,7 +25,7 @@ const Chatbot: React.FC<ChatbotProps> = ({
   const inputRef = useRef<HTMLInputElement>(null);
   
   // Store에서 상태와 액션 가져오기
-  const { user } = useAuthStore();
+  const { user, isAuthenticated } = useAuthStore();
   const { 
     currentSession, 
     messages, 
@@ -50,6 +50,13 @@ const Chatbot: React.FC<ChatbotProps> = ({
     console.log('Messages updated:', { count: messages.length, messages });
     scrollToBottom();
   }, [messages]);
+
+  // 로그아웃 시 챗봇 닫기
+  useEffect(() => {
+    if (!isAuthenticated) {
+      setIsOpen(false);
+    }
+  }, [isAuthenticated]);
 
   // 챗봇 열기/닫기
   const toggleChatbot = async () => {
@@ -162,6 +169,72 @@ const Chatbot: React.FC<ChatbotProps> = ({
     ));
   };
 
+  // 버튼 그룹 렌더링
+  const renderButtonGroup = (message: any) => {
+    try {
+      const metadata = JSON.parse(message.metadata || '{}');
+      const options = metadata.options || [];
+      
+      if (options.length === 0) return null;
+
+      return (
+        <div className="mt-3 flex flex-wrap gap-2">
+          {options.map((option: string, index: number) => (
+            <button
+              key={index}
+              onClick={() => handleButtonClick(option, message.sessionId)}
+              className="px-3 py-2 bg-primary text-white text-xs rounded-lg hover:bg-secondary transition-colors"
+            >
+              {option}
+            </button>
+          ))}
+        </div>
+      );
+    } catch (error) {
+      console.error('Failed to parse button group metadata:', error);
+      return null;
+    }
+  };
+
+  // 버튼 클릭 처리
+  const handleButtonClick = async (buttonText: string, sessionId: number) => {
+    try {
+      // 세션이 없으면 먼저 생성
+      if (!currentSession && sessionId === 0 && user) {
+        await createSession(
+          user.id, 
+          sessionType, 
+          user.preferredLanguage || 'ko'
+        );
+        // 세션 생성 후 잠시 대기
+        await new Promise(resolve => setTimeout(resolve, 100));
+      }
+      
+      // 현재 세션 ID 가져오기
+      const targetSessionId = currentSession?.id;
+      if (!targetSessionId) {
+        console.error('No active session');
+        return;
+      }
+      
+      // 버튼 텍스트를 사용자 메시지로 전송
+      await sendMessage(
+        targetSessionId,
+        'USER' as MessageSenderType,
+        buttonText,
+        'BUTTON' as MessageType
+      );
+      
+      // AI 응답 생성
+      await generateAiResponse(targetSessionId, buttonText);
+      
+      // 메시지 목록 새로고침
+      await getMessages(targetSessionId);
+    } catch (error) {
+      console.error('Failed to handle button click:', error);
+    }
+  };
+
   return (
     <div className={`fixed bottom-5 right-5 z-[1000] ${className}`}>
       {/* 챗봇 토글 버튼 */}
@@ -233,6 +306,8 @@ const Chatbot: React.FC<ChatbotProps> = ({
                     : 'bg-gray-100 text-text-primary'
                 }`}>
                   {formatMessage(message.messageContent)}
+                  {/* 버튼 그룹 렌더링 */}
+                  {message.messageType === 'BUTTON_GROUP' && renderButtonGroup(message)}
                 </div>
                 <div className={`text-xs text-text-secondary mt-1 ${
                   message.senderType === 'USER' ? 'text-right' : 'text-left'
