@@ -28,6 +28,7 @@ interface ChatState {
   setLoading: (loading: boolean) => void;
   clearMessages: () => void;
   addMessage: (message: ChatMessageResponse) => void;
+  clearSession: () => void;
 }
 
 export const useChatStore = create<ChatState>()(
@@ -154,7 +155,15 @@ export const useChatStore = create<ChatState>()(
       // 메시지 추가 (내부용)
       addMessage: (message) => set(state => ({
         messages: [...state.messages, message]
-      }))
+      })),
+
+      // 세션 완전 초기화 (로그아웃 시 사용)
+      clearSession: () => set({
+        currentSession: null,
+        messages: [],
+        isLoading: false,
+        error: null
+      })
     }),
     {
       name: 'chat-storage',
