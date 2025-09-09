@@ -40,12 +40,13 @@ const SignupPage: React.FC = () => {
       accountTypePlaceholder: "계정 유형을 선택해주세요",
       buyer: "구매자",
       seller: "판매자",
-      broker: "관세사 (Customs Broker)",
+      broker: "관세사",
       name: "이름",
       lastName: "성",
       companyName: "회사명",
       email: "이메일",
       password: "비밀번호",
+      confirmPassword: "비밀번호 확인",
       phone: "전화번호",
       agreeToTerms: "이용약관 및 개인정보처리방침에 동의합니다",
     },
@@ -71,7 +72,7 @@ const SignupPage: React.FC = () => {
       companyName: "company name",
       email: "email",
       password: "password",
-      confirmPassword: "password",
+      confirmPassword: "confirm password",
       phone: "phone number",
       agreeToTerms: "I agree to the terms and privacy policy",
     }
@@ -84,12 +85,12 @@ const SignupPage: React.FC = () => {
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value, type } = e.target;
     const checked = 'checked' in e.target ? e.target.checked : false;
-    
+
     setFormData(prev => ({
       ...prev,
       [name]: type === 'checkbox' ? checked : value,
     }));
-    
+
     // Clear error when user starts typing
     if (errors[name]) {
       setErrors(prev => ({ ...prev, [name]: '' }));
@@ -107,7 +108,10 @@ const SignupPage: React.FC = () => {
     }
     if (!formData.firstName) newErrors.firstName = '이름을 입력해주세요';
     if (!formData.lastName) newErrors.lastName = '성을 입력해주세요';
-    if (!formData.companyName) newErrors.companyName = '회사명을 입력해주세요';
+    if (formData.accountType === 'seller' && !formData.companyName) {
+      newErrors.companyName = '회사명을 입력해주세요';
+    }
+
     // if (!formData.phone) newErrors.phone = '전화번호를 입력해주세요';
     if (!formData.accountType || formData.accountType === 'default') {
       newErrors.accountType = '계정 유형을 선택해주세요';
@@ -121,7 +125,7 @@ const SignupPage: React.FC = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setSuccessMessage('');
-    
+
     if (!validateForm()) {
       return;
     }
@@ -138,14 +142,14 @@ const SignupPage: React.FC = () => {
       };
 
       const response = await userApi.signup(signupData);
-      
+
       setSuccessMessage('회원가입이 완료되었습니다! 로그인 페이지로 이동합니다.');
-      
+
       // 2초 후 로그인 페이지로 이동
       setTimeout(() => {
         navigate('/login');
       }, 2000);
-      
+
     } catch (error: any) {
       console.error('Signup error:', error);
       if (error.response?.status === 400) {
@@ -167,7 +171,7 @@ const SignupPage: React.FC = () => {
         <Globe size={16} />
         <span>{currentLanguage === 'ko' ? '한국어' : 'English'}</span>
       </button>
-      
+
       <div className="w-full max-w-6xl mx-auto">
         <div className="flex flex-col md:flex-row bg-white rounded-3xl shadow-2xl overflow-hidden min-h-[600px]">
           {/* Brand Section */}
@@ -238,9 +242,8 @@ const SignupPage: React.FC = () => {
                       name="firstName"
                       value={formData.firstName}
                       onChange={handleInputChange}
-                      className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent transition-colors ${
-                        errors.firstName ? 'border-error' : 'border-border'
-                      }`}
+                      className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent transition-colors ${errors.firstName ? 'border-error' : 'border-border'
+                        }`}
                       placeholder={translations[currentLanguage].name}
                       required
                     />
@@ -257,9 +260,8 @@ const SignupPage: React.FC = () => {
                       name="lastName"
                       value={formData.lastName}
                       onChange={handleInputChange}
-                      className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent transition-colors ${
-                        errors.lastName ? 'border-error' : 'border-border'
-                      }`}
+                      className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent transition-colors ${errors.lastName ? 'border-error' : 'border-border'
+                        }`}
                       placeholder={translations[currentLanguage].lastName}
                       required
                     />
@@ -269,7 +271,8 @@ const SignupPage: React.FC = () => {
 
                 <div>
                   <label htmlFor="companyName" className="block text-sm font-medium text-primary mb-1">
-                    {translations[currentLanguage].companyName} *
+                    {translations[currentLanguage].companyName}
+                    {formData.accountType === 'seller' && <span className="text-error"> *</span>}
                   </label>
                   <input
                     type="text"
@@ -277,14 +280,12 @@ const SignupPage: React.FC = () => {
                     name="companyName"
                     value={formData.companyName}
                     onChange={handleInputChange}
-                    className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent transition-colors ${
-                      errors.companyName ? 'border-error' : 'border-border'
-                    }`}
+                    className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent transition-colors ${errors.companyName ? 'border-error' : 'border-border'}`}
                     placeholder={translations[currentLanguage].companyName}
-                    required
                   />
                   {errors.companyName && <p className="text-error text-xs mt-1">{errors.companyName}</p>}
                 </div>
+
 
                 <div>
                   <label htmlFor="email" className="block text-sm font-medium text-primary mb-1">
@@ -296,9 +297,8 @@ const SignupPage: React.FC = () => {
                     name="email"
                     value={formData.email}
                     onChange={handleInputChange}
-                    className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent transition-colors ${
-                      errors.email ? 'border-error' : 'border-border'
-                    }`}
+                    className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent transition-colors ${errors.email ? 'border-error' : 'border-border'
+                      }`}
                     placeholder={translations[currentLanguage].email}
                     required
                   />
@@ -334,9 +334,8 @@ const SignupPage: React.FC = () => {
                     name="password"
                     value={formData.password}
                     onChange={handleInputChange}
-                    className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent transition-colors ${
-                      errors.password ? 'border-error' : 'border-border'
-                    }`}
+                    className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent transition-colors ${errors.password ? 'border-error' : 'border-border'
+                      }`}
                     placeholder={translations[currentLanguage].password}
                     required
                   />
@@ -345,7 +344,7 @@ const SignupPage: React.FC = () => {
 
                 <div>
                   <label htmlFor="confirmPassword" className="block text-sm font-medium text-primary mb-1">
-                    비밀번호 확인 *
+                    {translations[currentLanguage].confirmPassword} *
                   </label>
                   <input
                     type="password"
@@ -353,10 +352,9 @@ const SignupPage: React.FC = () => {
                     name="confirmPassword"
                     value={formData.confirmPassword}
                     onChange={handleInputChange}
-                    className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent transition-colors ${
-                      errors.confirmPassword ? 'border-error' : 'border-border'
-                    }`}
-                    placeholder="비밀번호를 다시 입력하세요"
+                    className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent transition-colors ${errors.confirmPassword ? 'border-error' : 'border-border'
+                      }`}
+                    placeholder={translations[currentLanguage].confirmPassword}
                     required
                   />
                   {errors.confirmPassword && <p className="text-error text-xs mt-1">{errors.confirmPassword}</p>}
@@ -369,9 +367,8 @@ const SignupPage: React.FC = () => {
                     name="accountType"
                     value={formData.accountType}
                     onChange={handleInputChange}
-                    className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent transition-colors ${
-                      errors.accountType ? 'border-error' : 'border-border'
-                    }`}
+                    className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent transition-colors ${errors.accountType ? 'border-error' : 'border-border'
+                      }`}
                     required
                   >
                     <option value="default">{translations[currentLanguage].accountTypePlaceholder}</option>
