@@ -8,10 +8,11 @@ import type {
 
 // Precedents 타입 정의 (data.sql 구조에 맞게 수정)
 export interface PrecedentsResponse {
-  similarProducts: string[];
-  approvalRate: number;
-  commonIssues: string[];
-  successFactors: string[];
+  successCases: string[];
+  failureCases: string[];
+  actionableInsights: string[];
+  riskFactors: string[];
+  recommendedAction: string;
   confidenceScore: number;
   isValid: boolean;
 }
