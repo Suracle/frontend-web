@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { HeaderSeller, ToastNotification, Chatbot, AnalysisTriggerButton } from '@/components/common';
+import { HeaderSeller, ToastNotification, Chatbot } from '@/components/common';
 import { ProductHeader, CommentsSection } from '@/components/seller';
 import { ProductInfoGrid, TariffAnalysisCard, RequirementsAnalysisCard, PrecedentsAnalysisCard } from '@/components/common';
 import { ArrowLeft } from 'lucide-react';
@@ -21,7 +21,13 @@ const ProductDetailPage: React.FC = () => {
   const [requirementLoading, setRequirementLoading] = useState(false);
   const [precedentsAnalysis, setPrecedentsAnalysis] = useState<PrecedentsResponse | null>(null);
   const [precedentsLoading, setPrecedentsLoading] = useState(false);
-  const [analysisStatus, setAnalysisStatus] = useState<{ analysisAvailable: boolean } | null>(null);
+  const [analysisStatus, setAnalysisStatus] = useState<{ 
+    analysisAvailable: boolean;
+    analysisInProgress: boolean;
+    analysisComplete: boolean;
+    precedentsComplete: boolean;
+    requirementsComplete: boolean;
+  } | null>(null);
 
   // 상품 상세 정보 조회
   const fetchProduct = async () => {
@@ -79,26 +85,6 @@ const ProductDetailPage: React.FC = () => {
     }
   };
 
-  // 분석 완료 후 데이터 새로고침
-  const handleAnalysisComplete = () => {
-    if (product) {
-      // 분석 결과 새로고침
-      fetchRequirementAnalysis(product.id);
-      fetchPrecedentsAnalysis(product.productId);
-      
-      // 성공 메시지 표시
-      setToastMessage('상품 분석이 완료되었습니다. 결과를 확인해주세요.');
-      setShowToast(true);
-      setTimeout(() => setShowToast(false), 3000);
-    }
-  };
-
-  // 분석 실패 시 처리
-  const handleAnalysisError = () => {
-    setToastMessage('분석 실행 중 오류가 발생했습니다. 다시 시도해주세요.');
-    setShowToast(true);
-    setTimeout(() => setShowToast(false), 3000);
-  };
 
   useEffect(() => {
     fetchProduct();
@@ -111,6 +97,45 @@ const ProductDetailPage: React.FC = () => {
       fetchAnalysisStatus(product.productId);
     }
   }, [product]);
+
+  // 분석 상태 폴링 (분석 중일 때만)
+  useEffect(() => {
+    if (!product || !analysisStatus?.analysisInProgress) return;
+
+    const pollInterval = setInterval(async () => {
+      try {
+        const status = await productApi.getAnalysisStatus(product.productId);
+        
+        // 새로운 분석 완료 체크
+        if (analysisStatus && !analysisStatus.precedentsComplete && status.precedentsComplete) {
+          setToastMessage('✅ 판례 분석이 완료되었습니다!');
+          setShowToast(true);
+          setTimeout(() => setShowToast(false), 3000);
+          fetchPrecedentsAnalysis(product.productId);
+        }
+        
+        if (analysisStatus && !analysisStatus.requirementsComplete && status.requirementsComplete) {
+          setToastMessage('✅ 요구사항 분석이 완료되었습니다!');
+          setShowToast(true);
+          setTimeout(() => setShowToast(false), 3000);
+          fetchRequirementAnalysis(product.id);
+        }
+        
+        setAnalysisStatus(status);
+        
+        // 전체 분석이 완료되면 데이터 새로고침
+        if (status.analysisComplete) {
+          setToastMessage('🎉 모든 분석이 완료되었습니다! 요구사항과 판례 정보를 확인하세요.');
+          setShowToast(true);
+          setTimeout(() => setShowToast(false), 5000);
+        }
+      } catch (error) {
+        console.error('분석 상태 폴링 실패:', error);
+      }
+    }, 3000); // 3초마다 폴링
+
+    return () => clearInterval(pollInterval);
+  }, [product, analysisStatus?.analysisInProgress]);
 
   const requestReview = () => {
     if (!product) return;
@@ -184,33 +209,65 @@ const ProductDetailPage: React.FC = () => {
             status: product.status === 'DRAFT' ? 'not_reviewed' : 
                    product.status === 'PENDING_REVIEW' ? 'pending' :
                    product.status === 'APPROVED' ? 'approved' : 'rejected',
-            analysisComplete: !!precedentsAnalysis,
-            precedentsAnalysis: precedentsAnalysis || undefined,
-            loading: precedentsLoading
+            analysisComplete: !!precedentsAnalysis
           }}
           onRequestReview={requestReview} 
         />
         
-        {/* 분석 실행 버튼 */}
-        {analysisStatus?.analysisAvailable && (
-          <div className="mb-6 p-4 bg-white rounded-lg shadow-sm border">
-            <div className="flex items-center justify-between">
-              <div>
-                <h3 className="text-lg font-semibold text-gray-900">AI 분석</h3>
-                <p className="text-sm text-gray-600">
-                  {product.hsCode ? 
-                    `HS코드 ${product.hsCode}에 대한 요구사항, 관세, 판례를 분석합니다.` :
-                    '상품의 요구사항, 관세, 판례를 분석합니다.'
-                  }
-                </p>
+
+        {/* 분석 중일 때 표시 */}
+        {analysisStatus?.analysisInProgress && (
+          <div className="mb-6 p-4 bg-blue-50 rounded-lg shadow-sm border border-blue-200">
+            <div className="flex items-center">
+              <div className="flex-shrink-0">
+                <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-blue-600"></div>
               </div>
-              <AnalysisTriggerButton
-                productId={product.productId}
-                analysisType="all"
-                onAnalysisComplete={handleAnalysisComplete}
-                onAnalysisError={handleAnalysisError}
-                className="ml-4"
-              />
+              <div className="ml-3">
+                <h3 className="text-sm font-medium text-blue-800">🔄 AI 분석 진행 중</h3>
+                <p className="text-sm text-blue-700">
+                  상품의 요구사항과 판례를 분석하고 있습니다. 잠시만 기다려주세요...
+                </p>
+                {/* 분석 단계별 진행 상황 */}
+                <div className="mt-3 space-y-2">
+                  <div className="flex items-center justify-between">
+                    <span className="text-xs font-medium text-blue-600">판례 분석</span>
+                    {analysisStatus.precedentsComplete ? (
+                      <span className="text-xs text-green-600 flex items-center">
+                        <svg className="w-3 h-3 mr-1" fill="currentColor" viewBox="0 0 20 20">
+                          <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                        </svg>
+                        완료
+                      </span>
+                    ) : (
+                      <span className="text-xs text-blue-600 flex items-center">
+                        <div className="animate-spin w-3 h-3 mr-1">
+                          <div className="w-full h-full border border-blue-600 border-t-transparent rounded-full"></div>
+                        </div>
+                        진행 중
+                      </span>
+                    )}
+                  </div>
+                  
+                  <div className="flex items-center justify-between">
+                    <span className="text-xs font-medium text-blue-600">요구사항 분석</span>
+                    {analysisStatus.requirementsComplete ? (
+                      <span className="text-xs text-green-600 flex items-center">
+                        <svg className="w-3 h-3 mr-1" fill="currentColor" viewBox="0 0 20 20">
+                          <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                        </svg>
+                        완료
+                      </span>
+                    ) : (
+                      <span className="text-xs text-blue-600 flex items-center">
+                        <div className="animate-spin w-3 h-3 mr-1">
+                          <div className="w-full h-full border border-blue-600 border-t-transparent rounded-full"></div>
+                        </div>
+                        진행 중
+                      </span>
+                    )}
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
         )}
@@ -284,6 +341,7 @@ const ProductDetailPage: React.FC = () => {
           title="AI 무역 어시스턴트"
           placeholder="메시지를 입력하세요..."
           welcomeMessage="AI 어시스턴트가 상품 관리와 관세 분석을 도와드립니다.\n궁금한 점이 있으시면 언제든 문의하세요!"
+          sessionType="SELLER_PRODUCT_INQUIRY"
         />
       </div>
 

@@ -1,11 +1,10 @@
 import React from 'react';
-import { ArrowLeft, Check, X, ClipboardCheck } from 'lucide-react';
+import { Check, X, ClipboardCheck } from 'lucide-react';
 
 interface ReviewFormProps {
   reviewComment: string;
   onCommentChange: (comment: string) => void;
   onSubmitReview: (decision: 'approved' | 'rejected') => void;
-  onGoBack: () => void;
   isSubmitting: boolean;
 }
 
@@ -13,7 +12,6 @@ const ReviewForm: React.FC<ReviewFormProps> = ({
   reviewComment,
   onCommentChange,
   onSubmitReview,
-  onGoBack,
   isSubmitting
 }) => {
   return (
@@ -42,14 +40,8 @@ const ReviewForm: React.FC<ReviewFormProps> = ({
           </div>
         </div>
         
-        <div className="flex flex-col sm:flex-row gap-3 justify-end">
-          <button
-            onClick={onGoBack}
-            className="px-6 py-3 border border-gray-300 text-gray-700 rounded-xl font-semibold hover:bg-gray-50 transition-colors flex items-center justify-center gap-2"
-          >
-            <ArrowLeft size={16} />
-            목록으로 돌아가기
-          </button>
+        <div className="flex gap-3 justify-end">
+          
           <button
             onClick={() => onSubmitReview('rejected')}
             disabled={!reviewComment.trim() || isSubmitting}

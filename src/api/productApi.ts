@@ -16,6 +16,18 @@ export interface PrecedentsResponse {
   isValid: boolean;
 }
 
+// 관세 분석 타입 정의
+export interface TariffAnalysisResponse {
+  hsCode: string;
+  tariffRate: number;
+  ftaRate: number;
+  estimatedDuty: number;
+  fobPrice: number;
+  description: string;
+  confidenceScore: number;
+  lastUpdated: string;
+}
+
 // 상품 API 함수들
 export const productApi = {
   // 상품 등록
@@ -158,7 +170,14 @@ export const productApi = {
   },
 
   // 분석 상태 확인
-  getAnalysisStatus: async (productId: string): Promise<{ success: boolean; analysisAvailable: boolean }> => {
+  getAnalysisStatus: async (productId: string): Promise<{ 
+    success: boolean; 
+    analysisAvailable: boolean;
+    analysisInProgress: boolean;
+    analysisComplete: boolean;
+    precedentsComplete: boolean;
+    requirementsComplete: boolean;
+  }> => {
     try {
       const response = await axiosInstance.get(`/products/${productId}/analysis/status`);
       return response.data;

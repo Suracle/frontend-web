@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { HeaderBuyer } from '@/components/common';
-import { Leaf, Sparkles, Coffee, Utensils, Calculator, MessageCircle, Bot, Send, Search, Filter } from 'lucide-react';
+import { HeaderBuyer, Chatbot } from '@/components/common';
+import { Leaf, Sparkles, Coffee, Utensils, Calculator, Search, Filter } from 'lucide-react';
 import { productApi } from '@/api/productApi';
 import type { ProductListResponse, PaginatedResponse } from '@/types';
 
@@ -27,11 +27,6 @@ const ProductsBuyerPage: React.FC = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [quantities, setQuantities] = useState<Record<string, number>>({});
   const [tariffInfo, setTariffInfo] = useState<Record<string, any>>({});
-  const [chatbotOpen, setChatbotOpen] = useState(false);
-  const [chatMessages, setChatMessages] = useState([
-    { type: 'bot', content: "Hello! I'm your AI trade assistant. Ask me about import requirements, regulations, or any product-specific concerns for purchasing from Korea." }
-  ]);
-  const [chatInput, setChatInput] = useState('');
   const [pagination, setPagination] = useState({
     page: 0,
     size: 12,
@@ -137,20 +132,6 @@ const ProductsBuyerPage: React.FC = () => {
     }));
   };
 
-  const sendMessage = () => {
-    if (!chatInput.trim()) return;
-    
-    setChatMessages(prev => [...prev, { type: 'user', content: chatInput }]);
-    setChatInput('');
-    
-    // Simulate bot response
-    setTimeout(() => {
-      setChatMessages(prev => [...prev, { 
-        type: 'bot', 
-        content: "I can help you with import requirements and regulations. Try asking something like 'What are the import requirements for [product name]?' or 'Help me understand customs requirements.'" 
-      }]);
-    }, 1000);
-  };
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -227,9 +208,6 @@ const ProductsBuyerPage: React.FC = () => {
                 <div className="text-2xl font-bold text-primary mb-4">
                   {formatPrice(product.price)}
                 </div>
-                <div className="text-sm text-text-secondary mb-4">
-                  FOB Price: {formatPrice(product.fobPrice)}
-                </div>
                 <div className="text-xs text-text-secondary mb-4">
                   HS Code: {product.hsCode} | Seller: {product.sellerName}
                 </div>
@@ -295,59 +273,13 @@ const ProductsBuyerPage: React.FC = () => {
           </div>
         )}
 
-        {/* Chatbot */}
-        <div className="fixed bottom-5 right-5 z-50">
-          <button
-            onClick={() => setChatbotOpen(!chatbotOpen)}
-            className="w-15 h-15 bg-gradient-primary text-white rounded-full shadow-lg hover:scale-110 transition-all duration-300 flex items-center justify-center"
-          >
-            <MessageCircle size={24} />
-          </button>
-          
-          {chatbotOpen && (
-            <div className="absolute bottom-16 right-0 w-96 h-96 bg-white rounded-2xl shadow-2xl flex flex-col">
-              {/* Chatbot Header */}
-              <div className="bg-gradient-primary text-white p-4 rounded-t-2xl flex items-center gap-3">
-                <Bot size={20} />
-                <div className="font-semibold">AI Trade Assistant</div>
-              </div>
-              
-              {/* Chat Messages */}
-              <div className="flex-1 p-5 overflow-y-auto space-y-4">
-                {chatMessages.map((message, index) => (
-                  <div
-                    key={index}
-                    className={`max-w-[80%] p-3 rounded-2xl text-sm ${
-                      message.type === 'user'
-                        ? 'bg-primary text-white ml-auto'
-                        : 'bg-accent-cream text-text-primary'
-                    }`}
-                  >
-                    {message.content}
-                  </div>
-                ))}
-              </div>
-              
-              {/* Chat Input */}
-              <div className="p-4 border-t border-gray-200 flex gap-3">
-                <input
-                  type="text"
-                  value={chatInput}
-                  onChange={(e) => setChatInput(e.target.value)}
-                  placeholder="Ask about import requirements..."
-                  className="flex-1 px-3 py-2 border-2 border-gray-300 rounded-xl focus-ring-primary"
-                  onKeyPress={(e) => e.key === 'Enter' && sendMessage()}
-                />
-                <button
-                  onClick={sendMessage}
-                  className="w-9 h-9 bg-primary text-white rounded-full hover:bg-secondary transition-colors flex items-center justify-center"
-                >
-                  <Send size={16} />
-                </button>
-              </div>
-            </div>
-          )}
-        </div>
+        {/* AI Chatbot */}
+        <Chatbot 
+          title="AI Trade Assistant"
+          placeholder="Ask about import requirements..."
+          welcomeMessage="Hello! I'm your AI trade assistant. Ask me about import requirements, regulations, or any product-specific concerns for purchasing from Korea."
+          sessionType="BUYER_PURCHASE_INQUIRY"
+        />
       </main>
     </div>
   );
