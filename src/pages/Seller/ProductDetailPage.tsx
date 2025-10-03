@@ -341,7 +341,6 @@ const ProductDetailPage: React.FC = () => {
           title="AI 무역 어시스턴트"
           placeholder="메시지를 입력하세요..."
           welcomeMessage="AI 어시스턴트가 상품 관리와 관세 분석을 도와드립니다.\n궁금한 점이 있으시면 언제든 문의하세요!"
-          sessionType="SELLER_PRODUCT_INQUIRY"
         />
       </div>
 
