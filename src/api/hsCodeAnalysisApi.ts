@@ -31,7 +31,8 @@ export const hsCodeAnalysisApi = {
   // 상품명과 설명을 기반으로 HS코드 분석 수행
   analyzeHsCode: async (request: HsCodeAnalysisRequest): Promise<HsCodeAnalysisResponse> => {
     try {
-      const response = await axiosInstance.post('/hs-code-analysis/analyze', request);
+      const response = await axiosInstance.post('/hs-code-graph/analyze', request);
+      //const response = await axiosInstance.post('/hs-code-analysis/analyze', request);
       return response.data;
     } catch (error) {
       console.error('Failed to analyze HS code:', error);
