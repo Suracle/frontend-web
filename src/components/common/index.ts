@@ -8,6 +8,7 @@ export { default as BrandSection } from './BrandSection';
 export { default as UserTypeCard } from './UserTypeCard';
 export { default as PlatformFeatures } from './PlatformFeatures';
 export { default as WorkflowExplanation } from './WorkflowExplanation';
+export { default as AnalysisTriggerButton } from './AnalysisTriggerButton';
 export { default as Chatbot } from './Chatbot';
 
 // Product Information Components
