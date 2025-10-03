@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { X, CheckCircle, AlertCircle } from 'lucide-react';
-import { hsCodeAnalysisApi, type HsCodeAnalysisRequest, type HsCodeSuggestion } from '@/api/hsCodeAnalysisApi';
+import { hsCodeAnalysisApi } from '@/api/hsCodeAnalysisApi';
+import { hsGraphGatewayApi, type HsCodeAnalysisRequest, type HsCodeSuggestion } from '@/api/hsGraphGatewayApi';
 
 interface HsCodeAnalysisProps {
   productName: string;
@@ -35,7 +36,8 @@ const HsCodeAnalysis: React.FC<HsCodeAnalysisProps> = ({
         analysisSessionId: analysisSessionId || undefined
       };
 
-      const response = await hsCodeAnalysisApi.analyzeHsCode(request);
+      // const response = await hsCodeAnalysisApi.analyzeHsCode(request);
+      const response = await hsGraphGatewayApi.analyze(request);
       setSuggestions(response.suggestions);
       setAnalysisSessionId(response.analysisSessionId);
     } catch (err) {
@@ -128,11 +130,10 @@ const HsCodeAnalysis: React.FC<HsCodeAnalysisProps> = ({
               {suggestions.map((suggestion, index) => (
                 <div
                   key={suggestion.id}
-                  className={`border-2 rounded-lg p-4 transition-all duration-200 ${
-                    selectedId === suggestion.id
-                      ? 'border-green-500 bg-green-50'
-                      : 'border-border hover:border-primary hover:shadow-md'
-                  }`}
+                  className={`border-2 rounded-lg p-4 transition-all duration-200 ${selectedId === suggestion.id
+                    ? 'border-green-500 bg-green-50'
+                    : 'border-border hover:border-primary hover:shadow-md'
+                    }`}
                 >
                   <div className="flex items-start justify-between mb-3">
                     <div className="flex-1">
@@ -175,11 +176,10 @@ const HsCodeAnalysis: React.FC<HsCodeAnalysisProps> = ({
                     <button
                       onClick={() => handleSelect(suggestion)}
                       disabled={selectedId === suggestion.id}
-                      className={`px-4 py-1.5 rounded-lg font-semibold text-sm transition-all duration-200 ${
-                        selectedId === suggestion.id
-                          ? 'bg-green-100 text-green-700 cursor-not-allowed'
-                          : 'bg-gradient-primary to-secondary text-white hover:transform hover:-translate-y-0.5 hover:shadow-lg'
-                      }`}
+                      className={`px-4 py-1.5 rounded-lg font-semibold text-sm transition-all duration-200 ${selectedId === suggestion.id
+                        ? 'bg-green-100 text-green-700 cursor-not-allowed'
+                        : 'bg-gradient-primary to-secondary text-white hover:transform hover:-translate-y-0.5 hover:shadow-lg'
+                        }`}
                     >
                       {selectedId === suggestion.id ? '선택됨' : '선택'}
                     </button>
