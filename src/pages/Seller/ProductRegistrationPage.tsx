@@ -14,6 +14,10 @@ interface ProductFormData {
   fobPrice: number;
   originCountry: string;
   hsCode: string;
+  hsCodeDescription?: string;  // AI 분석 결과
+  usTariffRate?: number;       // AI 분석 결과
+  reasoning?: string;          // HS 코드 추천 근거
+  tariffReasoning?: string;    // 관세율 적용 근거
 }
 
 const ProductRegistrationPage: React.FC = () => {
@@ -26,6 +30,10 @@ const ProductRegistrationPage: React.FC = () => {
     fobPrice: 0,
     originCountry: '',
     hsCode: '',
+    hsCodeDescription: undefined,
+    usTariffRate: undefined,
+    reasoning: undefined,
+    tariffReasoning: undefined,
   });
 
   const [errors, setErrors] = useState<Record<string, string>>({});
@@ -59,10 +67,14 @@ const ProductRegistrationPage: React.FC = () => {
     return Object.keys(newErrors).length === 0;
   };
 
-  const handleHsCodeSelected = (hsCode: string) => {
+  const handleHsCodeSelected = (hsCode: string, hsCodeDescription: string, usTariffRate: number, reasoning: string, tariffReasoning: string) => {
     setFormData(prev => ({
       ...prev,
-      hsCode: hsCode
+      hsCode: hsCode,
+      hsCodeDescription: hsCodeDescription,
+      usTariffRate: usTariffRate,
+      reasoning: reasoning,
+      tariffReasoning: tariffReasoning
     }));
     setShowHsCodeAnalysis(false);
   };
@@ -90,6 +102,10 @@ const ProductRegistrationPage: React.FC = () => {
         fobPrice: formData.fobPrice,
         originCountry: formData.originCountry,
         hsCode: formData.hsCode,
+        hsCodeDescription: formData.hsCodeDescription,  // AI 분석 결과
+        usTariffRate: formData.usTariffRate,           // AI 분석 결과
+        reasoning: formData.reasoning,                  // HS 코드 추천 근거
+        tariffReasoning: formData.tariffReasoning,      // 관세율 적용 근거
         status: 'DRAFT',
         isActive: true
       };
@@ -272,7 +288,7 @@ const ProductRegistrationPage: React.FC = () => {
                 <HsCodeAnalysis
                   productName={formData.productName}
                   productDescription={formData.description}
-                  onHsCodeSelected={(hsCode, description) => handleHsCodeSelected(hsCode)}
+                  onHsCodeSelected={handleHsCodeSelected}
                 />
               )}
 

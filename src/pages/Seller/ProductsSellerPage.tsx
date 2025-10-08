@@ -125,8 +125,10 @@ const ProductsSellerPage: React.FC = () => {
       }
       const sellerId = user.id;
       await productApi.deleteProduct(productId, sellerId);
-      // 삭제 후 목록 새로고침
+      
+      // ✅ 삭제 후 목록과 통계 모두 새로고침
       fetchProducts(pagination.page, searchTerm);
+      fetchStats();
     } catch (err) {
       console.error('Failed to delete product:', err);
       alert('상품 삭제에 실패했습니다.');

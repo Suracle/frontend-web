@@ -2,46 +2,70 @@ import React from 'react';
 import { MessageCircle } from 'lucide-react';
 import CommentItem from './CommentItem';
 import EmptyComments from './EmptyComments';
+import type { BrokerReviewResponse } from '@/api/brokerApi';
 
 interface CommentsSectionProps {
-  product: {
-    status: 'not_reviewed' | 'pending' | 'approved' | 'rejected';
-  };
+  brokerReview?: BrokerReviewResponse | null;
 }
 
-const CommentsSection: React.FC<CommentsSectionProps> = ({ product }) => {
+const CommentsSection: React.FC<CommentsSectionProps> = ({ brokerReview }) => {
+  // 날짜 포맷팅 함수
+  const formatDate = (dateString: string) => {
+    const date = new Date(dateString);
+    return date.toLocaleString('ko-KR', {
+      year: 'numeric',
+      month: '2-digit',
+      day: '2-digit',
+      hour: '2-digit',
+      minute: '2-digit'
+    }).replace(/\. /g, '.').replace(/\.$/, '');
+  };
+
   const renderComments = () => {
-    switch (product.status) {
-      case 'approved':
-        return (
-          <CommentItem
-            author="박관세사"
-            role="관세사"
-            date="2024.03.26 10:15"
-            content="상품이 모든 수입 요건을 충족하여 승인되었습니다. 무관세 적용 가능하며 특별한 추가 서류 없이 통관 가능합니다."
-          />
-        );
-      case 'rejected':
-        return (
-          <CommentItem
-            author="김관세사"
-            role="관세사"
-            date="2024.03.25 14:30"
-            content="25년 7월 이후 관세율이 변경되어 15%를 부과합니다."
-          />
-        );
-      case 'pending':
-        return (
-          <CommentItem
-            author="박관세사"
-            role="관세사"
-            date="2024.03.25 09:30"
-            content="현재 상품을 검토 중입니다. AI 분석 결과를 바탕으로 관세율, 수입 요건, 관련 판례를 종합적으로 검토하여 최종 의견을 작성하겠습니다."
-          />
-        );
-      default:
-        return <EmptyComments />;
+    // 리뷰가 없으면 빈 상태 표시
+    if (!brokerReview) {
+      return <EmptyComments />;
     }
+
+    // PENDING 상태일 때는 대기 중 메시지만 표시
+    if (brokerReview.reviewStatus === 'PENDING') {
+      return (
+        <div className="bg-yellow-50 border-2 border-yellow-200 rounded-xl p-6">
+          <div className="flex items-center gap-3 mb-3">
+            <div className="w-8 h-8 bg-yellow-400 rounded-full flex items-center justify-center">
+              <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+            </div>
+            <h4 className="font-semibold text-yellow-900">검토 대기 중</h4>
+          </div>
+          <p className="text-yellow-800 leading-relaxed">
+            관세사의 검토를 대기하는 중입니다. 곧 전문적인 의견을 받으실 수 있습니다.
+          </p>
+        </div>
+      );
+    }
+
+    // 승인/반려된 경우 실제 리뷰 데이터로 표시
+    const displayDate = brokerReview.reviewedAt 
+      ? formatDate(brokerReview.reviewedAt)
+      : formatDate(brokerReview.createdAt);
+
+    let defaultContent = '';
+    if (brokerReview.reviewStatus === 'APPROVED') {
+      defaultContent = '상품이 승인되었습니다.';
+    } else if (brokerReview.reviewStatus === 'REJECTED') {
+      defaultContent = '상품이 반려되었습니다.';
+    }
+
+    return (
+      <CommentItem
+        author={brokerReview.brokerName}
+        role="관세사"
+        date={displayDate}
+        content={brokerReview.reviewComment || defaultContent}
+      />
+    );
   };
 
   return (

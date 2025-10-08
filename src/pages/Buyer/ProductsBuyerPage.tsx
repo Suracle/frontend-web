@@ -15,6 +15,7 @@ interface Product {
   fobPrice: number;
   originCountry: string;
   hsCode: string;
+  usTariffRate?: number;  // HS 코드 기반 관세율
   status: 'DRAFT' | 'PENDING_REVIEW' | 'APPROVED' | 'REJECTED';
   isActive: boolean;
   createdAt: string;
@@ -109,15 +110,16 @@ const ProductsBuyerPage: React.FC = () => {
       return;
     }
     
-    // 임시 관세율 (실제로는 HS코드 기반으로 계산)
-    const tariffRate = 8.5; // 기본 관세율
+    // HS 코드 기반 실제 관세율 사용
+    const tariffRate = product.usTariffRate || 0; // HS 코드 테이블의 us_tariff_rate 사용
     const totalFobValue = product.fobPrice * quantity;
-    const tariffAmount = totalFobValue * (tariffRate / 100);
+    const tariffAmount = totalFobValue * tariffRate; // 이미 소수점 형태 (0.15 = 15%)
     const totalWithTariff = totalFobValue + tariffAmount;
     
     setTariffInfo(prev => ({
       ...prev,
       [productId]: {
+        tariffRate,
         tariffAmount,
         totalWithTariff,
         show: true
@@ -236,10 +238,10 @@ const ProductsBuyerPage: React.FC = () => {
                 {/* Tariff Info */}
                 {tariffInfo[product.productId]?.show && (
                   <div className="bg-accent-cream p-3 rounded-lg mt-auto">
-                    <div className="text-primary font-semibold mb-1">
+                    <div className="text-xs text-text-primary mb-2">
                       Estimated Tariff: {formatPrice(tariffInfo[product.productId].tariffAmount)}
                     </div>
-                    <div className="text-xs text-text-secondary">
+                    <div className="text-lg font-bold text-primary">
                       Total with tariff: {formatPrice(tariffInfo[product.productId].totalWithTariff)}
                     </div>
                   </div>
