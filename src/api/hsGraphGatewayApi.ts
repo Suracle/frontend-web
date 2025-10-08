@@ -15,8 +15,11 @@ export interface HsCodeSuggestion {
   hsCode: string;
   description: string;
   confidenceScore: number;
-  reasoning: string;
+  reasoning: string;  // HS 코드 추천 근거
+  tariffReasoning?: string;  // 관세율 적용 근거
   usTariffRate: number;
+  baseTariffRate?: number;
+  reciprocalTariffRate?: number;
   usitcUrl: string;
   hierarchicalDescription?: HierarchicalDescription;
 }
@@ -35,8 +38,8 @@ export interface HsCodeAnalysisResponse {
 export const hsGraphGatewayApi = {
   analyze: async (request: HsCodeAnalysisRequest): Promise<HsCodeAnalysisResponse> => {
     try {
-      // hs_graph_service의 실제 엔드포인트 사용
-      const response = await axiosInstance.post('http://localhost:8000/api/hs-code/analyze-graph', request);
+      // 백엔드 API를 통한 HS 그래프 분석 (충돌 방지용 엔드포인트)
+      const response = await axiosInstance.post('/hs-code-analysis/analyze-graph', request);
       return response.data;
     } catch (error: any) {
       // 타임아웃 또는 기타 에러 처리

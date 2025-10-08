@@ -9,6 +9,8 @@ interface ProductInfoGridProps {
     origin: string;
     hsCode: string;
     hsCodeDescription: string;
+    usTariffRate?: number;    // 관세율 (선택사항)
+    reasoning?: string;       // 관세 관련 설명 (선택사항)
     description: string;
   };
 }

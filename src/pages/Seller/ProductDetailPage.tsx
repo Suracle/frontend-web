@@ -7,11 +7,14 @@ import { ArrowLeft } from 'lucide-react';
 
 import { requirementApi, type RequirementAnalysisResponse } from '@/api/requirementApi';
 import { productApi, type PrecedentsResponse } from '@/api/productApi';
+import { brokerApi, type BrokerReviewResponse } from '@/api/brokerApi';
 import type { ProductResponse } from '@/types';
+import { useAuthStore } from '@/stores/authStore';
 
 const ProductDetailPage: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
+  const { user } = useAuthStore();
   const [product, setProduct] = useState<ProductResponse | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -21,6 +24,7 @@ const ProductDetailPage: React.FC = () => {
   const [requirementLoading, setRequirementLoading] = useState(false);
   const [precedentsAnalysis, setPrecedentsAnalysis] = useState<PrecedentsResponse | null>(null);
   const [precedentsLoading, setPrecedentsLoading] = useState(false);
+  const [brokerReview, setBrokerReview] = useState<BrokerReviewResponse | null>(null);
 
   // 상품 상세 정보 조회
   const fetchProduct = async () => {
@@ -66,6 +70,16 @@ const ProductDetailPage: React.FC = () => {
     }
   };
 
+  // 관세사 리뷰 조회
+  const fetchBrokerReview = async (productId: number) => {
+    try {
+      const review = await brokerApi.getLatestReviewByProductId(productId);
+      setBrokerReview(review);
+    } catch (error) {
+      console.error('Failed to fetch broker review:', error);
+    }
+  };
+
   useEffect(() => {
     fetchProduct();
   }, [id]);
@@ -74,19 +88,47 @@ const ProductDetailPage: React.FC = () => {
     if (product) {
       fetchRequirementAnalysis(product.id);
       fetchPrecedentsAnalysis(product.productId);
+      fetchBrokerReview(product.id);
     }
-  }, [product]);
+  }, [product?.id]); // product 전체가 아닌 product.id만 의존성으로 설정
 
-  const requestReview = () => {
-    if (!product) return;
+  const requestReview = async () => {
+    if (!product || !user) {
+      setToastMessage('로그인이 필요합니다.');
+      setShowToast(true);
+      return;
+    }
     
-    setProduct(prev => prev ? { ...prev, status: 'PENDING_REVIEW' } : null);
-    setToastMessage('관세사 검토 요청이 전송되었습니다.');
-    setShowToast(true);
+    // 기본 관세사 ID (실제로는 관세사 선택 기능이 필요할 수 있음)
+    const DEFAULT_BROKER_ID = 3; // 임시로 ID 3 사용
     
-    setTimeout(() => {
-      setShowToast(false);
-    }, 3000);
+    try {
+      // 백엔드 API 호출하여 리뷰 요청 생성
+      await brokerApi.createReviewRequest({
+        productId: product.id,
+        brokerId: DEFAULT_BROKER_ID,
+        reviewStatus: 'PENDING',
+        reviewComment: ''  // 관세사가 직접 작성하도록 비워둠
+      });
+      
+      // 상품 상태 업데이트 (프론트엔드 상태)
+      setProduct(prev => prev ? { ...prev, status: 'PENDING_REVIEW' } : null);
+      
+      setToastMessage('관세사 검토 요청이 전송되었습니다.');
+      setShowToast(true);
+      
+      setTimeout(() => {
+        setShowToast(false);
+      }, 3000);
+    } catch (error) {
+      console.error('Failed to request review:', error);
+      setToastMessage('검토 요청에 실패했습니다. 다시 시도해주세요.');
+      setShowToast(true);
+      
+      setTimeout(() => {
+        setShowToast(false);
+      }, 3000);
+    }
   };
 
   const goBack = () => {
@@ -144,7 +186,7 @@ const ProductDetailPage: React.FC = () => {
         <main className="flex-1 max-w-6xl mx-auto px-5 py-8">
         <ProductHeader 
           product={{
-            id: product.id.toString(),
+            id: product.productId,  // ✅ product.id 대신 product.productId 사용
             name: product.productName,
             status: product.status === 'DRAFT' ? 'not_reviewed' : 
                    product.status === 'PENDING_REVIEW' ? 'pending' :
@@ -161,7 +203,9 @@ const ProductDetailPage: React.FC = () => {
           fobPrice: product.fobPrice,
           origin: product.originCountry,
           hsCode: product.hsCode,
-          hsCodeDescription: product.hsCodeDescription,
+          hsCodeDescription: product.hsCodeDescription,  // HS 코드 설명 (combined_description)
+          usTariffRate: product.usTariffRate,           // 관세율
+          reasoning: product.reasoning,                  // 관세 관련 설명
           description: product.description
         }} />
         
@@ -169,7 +213,10 @@ const ProductDetailPage: React.FC = () => {
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-5 mb-8">
           <TariffAnalysisCard product={{
             hsCode: product.hsCode,
-            fobPrice: product.fobPrice
+            fobPrice: product.fobPrice,
+            originCountry: product.originCountry,
+            usTariffRate: product.usTariffRate,  // 최종 관세율
+            tariffReasoning: product.tariffReasoning  // 관세율 적용 근거
           }} />
           <RequirementsAnalysisCard product={{
             analysisComplete: !!requirementAnalysis,
@@ -183,11 +230,7 @@ const ProductDetailPage: React.FC = () => {
           }} />
         </div>
         
-        <CommentsSection product={{
-          status: product.status === 'DRAFT' ? 'not_reviewed' : 
-                 product.status === 'PENDING_REVIEW' ? 'pending' :
-                 product.status === 'APPROVED' ? 'approved' : 'rejected'
-        }} />
+        <CommentsSection brokerReview={brokerReview} />
 
         {/* Action Buttons */}
         <div className="flex justify-end mt-8">

@@ -7,6 +7,8 @@ interface ProductHeaderProps {
     name: string;
     status: 'not_reviewed' | 'pending' | 'approved' | 'rejected';
     analysisComplete: boolean;
+    precedentsAnalysis?: any;  // 판례 분석 결과 (선택사항)
+    loading?: boolean;         // 로딩 상태 (선택사항)
   };
   onRequestReview: () => void;
 }
@@ -55,15 +57,17 @@ const ProductHeader: React.FC<ProductHeaderProps> = ({ product, onRequestReview 
             {getStatusBadge(product.status)}
             <button
               onClick={onRequestReview}
-              disabled={!product.analysisComplete || product.status === 'pending'}
+              disabled={!product.analysisComplete || product.status === 'pending' || product.status === 'approved' || product.status === 'rejected'}
               className={`px-5 py-2 rounded-full font-semibold flex items-center gap-2 transition-all ${
-                product.analysisComplete && product.status !== 'pending'
+                product.analysisComplete && product.status === 'not_reviewed'
                   ? 'bg-blue-600 text-white hover:bg-blue-700 hover:-translate-y-0.5'
                   : 'bg-gray-300 text-gray-500 cursor-not-allowed'
               }`}
             >
               <Send size={16} />
-              {product.status === 'pending' ? '검토 대기 중' : '관세사 검토 요청'}
+              {product.status === 'pending' ? '검토 대기 중' : 
+               product.status === 'approved' || product.status === 'rejected' ? '관세사 검토 완료' : 
+               '관세사 검토 요청'}
             </button>
           </div>
         </div>
