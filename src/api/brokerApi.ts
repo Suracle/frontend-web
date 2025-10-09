@@ -146,6 +146,20 @@ export const brokerApi = {
     return response.data;
   },
 
+  // 상품의 최신 리뷰 조회 (단일)
+  getLatestReviewByProductId: async (productId: number): Promise<BrokerReviewResponse | null> => {
+    try {
+      const response = await axiosInstance.get(`/broker/reviews/product/${productId}/latest`);
+      return response.data;
+    } catch (error: any) {
+      // 204 No Content인 경우 null 반환
+      if (error.response?.status === 204) {
+        return null;
+      }
+      throw error;
+    }
+  },
+
   // 리뷰 상태별 목록 조회
   getReviewsByStatus: async (
     status: 'PENDING' | 'APPROVED' | 'REJECTED',
