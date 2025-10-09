@@ -158,8 +158,8 @@ const ReviewPage: React.FC = () => {
       const mapping = await productApi.getProductIdMapping(productId);
       const stringProductId = mapping.productId;
       
-      // 기존 getProductPrecedents API 사용
-      const analysis = await productApi.getProductPrecedents(stringProductId);
+      // 기존 getProductPrecedents API 사용 (실제 상품 데이터 전달)
+      const analysis = await productApi.getProductPrecedents(stringProductId, product);
       console.log("Precedents analysis result:", analysis);
       setPrecedentsAnalysis(analysis);
     } catch (error) {

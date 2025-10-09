@@ -246,10 +246,34 @@ export const productApi = {
   },
 
   // 상품의 판례 분석 결과 조회
-  getProductPrecedents: async (productId: string): Promise<PrecedentsResponse> => {
+  getProductPrecedents: async (productId: string, productData?: any): Promise<PrecedentsResponse> => {
     try {
-      const response = await axiosInstance.get(`/products/${productId}/precedents`);
-      return response.data;
+      // Python AI 엔진의 analyze-precedents 엔드포인트 사용 (8000번 포트)
+      const requestData = {
+        product_id: productId,
+        product_name: productData?.productName || "premium vitamin serum C",
+        hs_code: productData?.hsCode || "3304.99.50.00",
+        description: productData?.description || "Korean premium vitamin C serum for skincare",
+        origin_country: productData?.originCountry || "Korea",
+        price: productData?.price || 25.00,
+        fob_price: productData?.fobPrice || 22.00
+      };
+      
+      console.log("Sending precedents analysis request:", requestData);
+      // Python AI 엔진으로 직접 요청
+      const response = await fetch('http://localhost:8000/analyze-precedents', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(requestData)
+      });
+      
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+      
+      return await response.json();
     } catch (error) {
       console.error('Failed to get product precedents:', error);
       throw error;
