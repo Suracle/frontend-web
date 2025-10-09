@@ -61,7 +61,11 @@ const ProductDetailPage: React.FC = () => {
   const fetchPrecedentsAnalysis = async (productId: string) => {
     try {
       setPrecedentsLoading(true);
-      console.log("Fetching precedents for productId:", productId); const analysis = await productApi.getProductPrecedents(productId); console.log("Precedents analysis result:", analysis);
+      console.log("Fetching precedents for productId:", productId);
+      
+      // 실제 상품 데이터를 전달
+      const analysis = await productApi.getProductPrecedents(productId, product);
+      console.log("Precedents analysis result:", analysis);
       setPrecedentsAnalysis(analysis);
     } catch (error) {
       console.error('Failed to fetch precedents analysis:', error);
