@@ -36,6 +36,10 @@ export interface ProductRequest {
   fobPrice: number;
   originCountry: string;
   hsCode: string;
+  hsCodeDescription?: string;  // AI 분석 결과
+  usTariffRate?: number;       // AI 분석 결과
+  reasoning?: string;          // HS 코드 추천 근거
+  tariffReasoning?: string;    // 관세율 적용 근거
   status: 'DRAFT' | 'PENDING_REVIEW' | 'APPROVED' | 'REJECTED';
   isActive: boolean;
 }
@@ -51,7 +55,10 @@ export interface ProductResponse {
   fobPrice: number;
   originCountry: string;
   hsCode: string;
-  hsCodeDescription: string;
+  hsCodeDescription: string;  // HS 코드 설명 (combined_description)
+  usTariffRate: number;       // 최종 관세율
+  reasoning: string;          // HS 코드 추천 근거 (AI 분석)
+  tariffReasoning: string;    // 관세율 적용 근거 (AI 분석)
   status: 'DRAFT' | 'PENDING_REVIEW' | 'APPROVED' | 'REJECTED';
   isActive: boolean;
   createdAt: string;

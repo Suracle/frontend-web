@@ -52,7 +52,7 @@ const ReviewForm: React.FC<ReviewFormProps> = ({
           </button>
           <button
             onClick={() => onSubmitReview('approved')}
-            disabled={!reviewComment.trim() || isSubmitting}
+            disabled={isSubmitting}
             className="px-6 py-3 bg-green-600 text-white rounded-xl font-semibold hover:bg-green-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
           >
             <Check size={16} />

@@ -1,5 +1,6 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
+import { useChatStore } from './chatStore';
 
 interface User {
   id: number;
@@ -24,6 +25,8 @@ export const useAuthStore = create<AuthState>()(
       isAuthenticated: false,
       login: (user) => set({ user, isAuthenticated: true }),
       logout: () => {
+        // 챗 세션 정리
+        useChatStore.getState().clearSession();
         // 사용자 정보 초기화
         set({ user: null, isAuthenticated: false });
       },

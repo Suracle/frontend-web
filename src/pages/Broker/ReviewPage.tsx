@@ -25,6 +25,8 @@ interface ProductDetail {
   origin: string;
   hsCode: string;
   hsCodeDescription?: string;
+  usTariffRate?: number;
+  tariffReasoning?: string;
   sellerName: string;
   requestDate: string;
   status: 'pending' | 'approved' | 'rejected';
@@ -109,6 +111,8 @@ const ReviewPage: React.FC = () => {
         origin: productData.originCountry,
         hsCode: productData.hsCode,
         hsCodeDescription: productData.hsCodeDescription,
+        usTariffRate: productData.usTariffRate,
+        tariffReasoning: productData.tariffReasoning,
         sellerName: productData.sellerName,
         requestDate: new Date(reviewData.requestedAt).toLocaleString('ko-KR'),
         status: reviewData.reviewStatus.toLowerCase() as 'pending' | 'approved' | 'rejected',
@@ -118,10 +122,9 @@ const ReviewPage: React.FC = () => {
       
       setProduct(productDetail);
       
-      // PENDING 상태일 때만 기존 리뷰 코멘트 설정 (편집 가능)
-      if (reviewData.reviewStatus === 'PENDING' && reviewData.reviewComment) {
-        setReviewComment(reviewData.reviewComment);
-      }
+      // PENDING 상태일 때는 빈 코멘트로 시작 (관세사가 직접 작성)
+      // 초기 요청 메시지는 표시하지 않음
+      setReviewComment('');
       
     } catch (error) {
       console.error('Failed to load review data:', error);
@@ -158,8 +161,8 @@ const ReviewPage: React.FC = () => {
       const mapping = await productApi.getProductIdMapping(productId);
       const stringProductId = mapping.productId;
       
-      // 기존 getProductPrecedents API 사용
-      const analysis = await productApi.getProductPrecedents(stringProductId);
+      // 기존 getProductPrecedents API 사용 (실제 상품 데이터 전달)
+      const analysis = await productApi.getProductPrecedents(stringProductId, product);
       console.log("Precedents analysis result:", analysis);
       setPrecedentsAnalysis(analysis);
     } catch (error) {
@@ -238,8 +241,14 @@ const ReviewPage: React.FC = () => {
 
 
   const submitReview = async (decision: 'approved' | 'rejected') => {
-    if (!reviewComment.trim()) {
-      alert('검토 의견을 작성해주세요.');
+    // 반려 시에만 의견 필수
+    if (decision === 'rejected' && !reviewComment.trim()) {
+      alert('반려 시에는 검토 의견을 작성해주세요.');
+      return;
+    }
+
+    if (!review) {
+      alert('리뷰 정보를 찾을 수 없습니다.');
       return;
     }
 
@@ -256,11 +265,14 @@ const ReviewPage: React.FC = () => {
       try {
         setIsSubmitting(true);
         
+        // 승인 시 의견이 없으면 기본 메시지 사용
+        const comment = reviewComment.trim() || (decision === 'approved' ? '상품이 승인되었습니다.' : '');
+        
         // API 호출
         await brokerApi.updateReviewStatus(
           review.id,
           decision.toUpperCase() as 'APPROVED' | 'REJECTED',
-          reviewComment
+          comment
         );
         
         // Show toast notification
@@ -383,7 +395,10 @@ const ReviewPage: React.FC = () => {
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-5 mb-8">
           <TariffAnalysisCard product={{
             hsCode: product.hsCode,
-            fobPrice: product.price
+            fobPrice: product.fobPrice,
+            originCountry: product.origin,
+            usTariffRate: product.usTariffRate,
+            tariffReasoning: product.tariffReasoning
           }} />
           <RequirementsAnalysisCard product={{
             analysisComplete: !!requirementAnalysis,
