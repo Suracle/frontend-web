@@ -252,6 +252,11 @@ const ReviewPage: React.FC = () => {
       return;
     }
 
+    if (!review) {
+      alert('리뷰 정보를 찾을 수 없습니다.');
+      return;
+    }
+
     const confirmMessage = decision === 'approved' ? 
       '이 상품을 승인하시겠습니까?' : 
       '이 상품을 반려하시겠습니까?';

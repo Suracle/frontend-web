@@ -42,6 +42,18 @@ export interface TariffAnalysisResponse {
   lastUpdated: string;
 }
 
+// 관세 분석 타입 정의
+export interface TariffAnalysisResponse {
+  hsCode: string;
+  tariffRate: number;
+  ftaRate: number;
+  estimatedDuty: number;
+  fobPrice: number;
+  description: string;
+  confidenceScore: number;
+  lastUpdated: string;
+}
+
 // 상품 API 함수들
 export const productApi = {
   // 상품 등록
@@ -170,6 +182,57 @@ export const productApi = {
       return { productId: response.data.productId };
     } catch (error) {
       console.error('Failed to get product ID mapping:', error);
+      throw error;
+    }
+  },
+
+  // 상품 분석 실행
+  triggerAnalysis: async (productId: string): Promise<{ success: boolean; message: string }> => {
+    try {
+      const response = await axiosInstance.post(`/products/${productId}/analyze`);
+      return response.data;
+    } catch (error) {
+      console.error('Failed to trigger analysis:', error);
+      throw error;
+    }
+  },
+
+  // 요구사항 분석 실행
+  triggerRequirementsAnalysis: async (productId: string): Promise<{ success: boolean; message: string }> => {
+    try {
+      const response = await axiosInstance.post(`/products/${productId}/analyze/requirements`);
+      return response.data;
+    } catch (error) {
+      console.error('Failed to trigger requirements analysis:', error);
+      throw error;
+    }
+  },
+
+  // 관세 분석 실행
+  triggerTariffAnalysis: async (productId: string): Promise<{ success: boolean; message: string }> => {
+    try {
+      const response = await axiosInstance.post(`/products/${productId}/analyze/tariff`);
+      return response.data;
+    } catch (error) {
+      console.error('Failed to trigger tariff analysis:', error);
+      throw error;
+    }
+  },
+
+  // 분석 상태 확인
+  getAnalysisStatus: async (productId: string): Promise<{ 
+    success: boolean; 
+    analysisAvailable: boolean;
+    analysisInProgress: boolean;
+    analysisComplete: boolean;
+    precedentsComplete: boolean;
+    requirementsComplete: boolean;
+  }> => {
+    try {
+      const response = await axiosInstance.get(`/products/${productId}/analysis/status`);
+      return response.data;
+    } catch (error) {
+      console.error('Failed to get analysis status:', error);
       throw error;
     }
   }

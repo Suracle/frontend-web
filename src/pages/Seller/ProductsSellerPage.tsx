@@ -126,7 +126,7 @@ const ProductsSellerPage: React.FC = () => {
       const sellerId = user.id;
       await productApi.deleteProduct(productId, sellerId);
       
-      // ✅ 삭제 후 목록과 통계 모두 새로고침
+      // 삭제 후 목록과 통계 모두 새로고침
       fetchProducts(pagination.page, searchTerm);
       fetchStats();
     } catch (err) {
