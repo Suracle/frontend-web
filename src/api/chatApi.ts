@@ -33,7 +33,7 @@ export const chatApi = {
       language,
       sessionData
     };
-    
+
     const response = await axiosInstance.post('/chat/sessions', requestData);
     return response.data;
   },
@@ -63,7 +63,7 @@ export const chatApi = {
     if (sessionType) {
       params.append('sessionType', sessionType);
     }
-    
+
     const response = await axiosInstance.get(`/chat/sessions?${params.toString()}`);
     return response.data;
   },
@@ -85,7 +85,7 @@ export const chatApi = {
     if (sessionData) {
       params.append('sessionData', sessionData);
     }
-    
+
     const response = await axiosInstance.put(`/chat/sessions/${sessionId}?${params.toString()}`);
     return response.data;
   },
@@ -113,7 +113,7 @@ export const chatApi = {
       messageType,
       metadata
     };
-    
+
     const response = await axiosInstance.post(`/chat/sessions/${sessionId}/messages`, requestData);
     return response.data;
   },
@@ -136,7 +136,7 @@ export const chatApi = {
     params.append('page', page.toString());
     params.append('size', size.toString());
     params.append('sort', sort);
-    
+
     const response = await axiosInstance.get(`/chat/sessions/${sessionId}/messages?${params.toString()}`);
     return response.data;
   },
@@ -163,7 +163,7 @@ export const chatApi = {
   ): Promise<ChatMessageResponse> => {
     const params = new URLSearchParams();
     params.append('userMessage', userMessage);
-    
+
     const response = await axiosInstance.post(`/chat/sessions/${sessionId}/ai-response?${params.toString()}`);
     return response.data;
   },
@@ -176,7 +176,7 @@ export const chatApi = {
   cleanupExpiredData: async (expiredHours: number = 24): Promise<number> => {
     const params = new URLSearchParams();
     params.append('expiredHours', expiredHours.toString());
-    
+
     const response = await axiosInstance.post(`/chat/cleanup?${params.toString()}`);
     return response.data;
   }
