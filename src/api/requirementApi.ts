@@ -121,20 +121,23 @@ export interface EstimatedCosts {
     max: number;
     currency: string;
     source_url?: string;
+    reasoning?: string;  // 비용 계산 이유 설명
   };
   legal_review?: {
     min: number;
     max: number;
     currency: string;
     source_url?: string;
+    reasoning?: string;  // 비용 계산 이유 설명
   };
   certification?: {
     min: number;
     max: number;
     currency: string;
     source_url?: string;
+    reasoning?: string;  // 비용 계산 이유 설명
   };
-  notes?: string;
+  notes?: string;  // 전반적인 비용 근거 설명
 }
 
 // 권장사항 (한국어 지원)
@@ -170,6 +173,7 @@ export interface TimelineDetail {
   maximum_days: number;
   critical_path?: string[];
   source_url?: string;
+  reasoning?: string;  // 타임라인 계산 이유 설명 (예: "FDA 검토 15일 + 실험실 테스트 10일")
 }
 
 // Phase 2-4 전문 분석 결과
@@ -405,6 +409,7 @@ export interface ComplianceScore {
       score: number;
       weight: number;
       max_score: number;
+      reasoning?: string;  // 점수 계산 이유 설명 (예: "5개 필수 문서로 인해 중간 점수")
     };
   };
   improvement_areas: Array<{

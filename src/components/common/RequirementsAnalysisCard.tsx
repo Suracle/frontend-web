@@ -376,6 +376,11 @@ const RequirementsAnalysisCard: React.FC<RequirementsAnalysisCardProps> = ({ pro
                             ${product.requirementAnalysis.estimatedCosts.total.min.toLocaleString()} - ${product.requirementAnalysis.estimatedCosts.total.max.toLocaleString()} {product.requirementAnalysis.estimatedCosts.total.currency}
                           </span>
                         </div>
+                        {(product.requirementAnalysis.estimatedCosts as any).notes && (
+                          <div className="text-xs text-teal-600 mt-2">
+                            💡 {(product.requirementAnalysis.estimatedCosts as any).notes}
+                          </div>
+                        )}
                       </div>
 
                       {/* 세부 비용 */}
@@ -386,6 +391,11 @@ const RequirementsAnalysisCard: React.FC<RequirementsAnalysisCardProps> = ({ pro
                             <div className="font-semibold text-blue-900">
                               ${product.requirementAnalysis.estimatedCosts.testing.min.toLocaleString()} - ${product.requirementAnalysis.estimatedCosts.testing.max.toLocaleString()}
                             </div>
+                            {(product.requirementAnalysis.estimatedCosts.testing as any).reasoning && (
+                              <div className="text-xs text-blue-700 mt-1">
+                                {(product.requirementAnalysis.estimatedCosts.testing as any).reasoning}
+                              </div>
+                            )}
                             {product.requirementAnalysis.estimatedCosts.testing.source_url && (
                               <a
                                 href={product.requirementAnalysis.estimatedCosts.testing.source_url}
@@ -406,6 +416,11 @@ const RequirementsAnalysisCard: React.FC<RequirementsAnalysisCardProps> = ({ pro
                             <div className="font-semibold text-purple-900">
                               ${product.requirementAnalysis.estimatedCosts.legal_review.min.toLocaleString()} - ${product.requirementAnalysis.estimatedCosts.legal_review.max.toLocaleString()}
                             </div>
+                            {(product.requirementAnalysis.estimatedCosts.legal_review as any).reasoning && (
+                              <div className="text-xs text-purple-700 mt-1">
+                                {(product.requirementAnalysis.estimatedCosts.legal_review as any).reasoning}
+                              </div>
+                            )}
                             {product.requirementAnalysis.estimatedCosts.legal_review.source_url && (
                               <a
                                 href={product.requirementAnalysis.estimatedCosts.legal_review.source_url}
@@ -426,6 +441,11 @@ const RequirementsAnalysisCard: React.FC<RequirementsAnalysisCardProps> = ({ pro
                             <div className="font-semibold text-green-900">
                               ${product.requirementAnalysis.estimatedCosts.certification.min.toLocaleString()} - ${product.requirementAnalysis.estimatedCosts.certification.max.toLocaleString()}
                             </div>
+                            {(product.requirementAnalysis.estimatedCosts.certification as any).reasoning && (
+                              <div className="text-xs text-green-700 mt-1">
+                                {(product.requirementAnalysis.estimatedCosts.certification as any).reasoning}
+                              </div>
+                            )}
                             {product.requirementAnalysis.estimatedCosts.certification.source_url && (
                               <a
                                 href={product.requirementAnalysis.estimatedCosts.certification.source_url}
@@ -572,6 +592,11 @@ const RequirementsAnalysisCard: React.FC<RequirementsAnalysisCardProps> = ({ pro
                         </div>
                       </div>
                     )}
+                    {(product.requirementAnalysis.timelineDetail as any).reasoning && (
+                      <div className="text-xs text-cyan-700 p-2 bg-cyan-100 rounded mt-3">
+                        📊 {(product.requirementAnalysis.timelineDetail as any).reasoning}
+                      </div>
+                    )}
                     {product.requirementAnalysis.timelineDetail.source_url && (
                       <a
                         href={product.requirementAnalysis.timelineDetail.source_url}
@@ -588,38 +613,8 @@ const RequirementsAnalysisCard: React.FC<RequirementsAnalysisCardProps> = ({ pro
               </div>
             )}
 
-            {/* 타임라인 및 기타 정보 */}
+            {/* 기타 정보 */}
             <div className="space-y-4">
-              {product.requirementAnalysis.timeline && (
-                <div className="p-3 bg-yellow-50 border border-yellow-200 rounded-lg">
-                  <h5 className="font-medium text-yellow-800 mb-1">예상 소요 시간</h5>
-                  {typeof product.requirementAnalysis.timeline === 'string' ? (
-                    <p className="text-sm text-yellow-700">{product.requirementAnalysis.timeline}</p>
-                  ) : (
-                    <div className="text-sm text-yellow-700">
-                      <div className="grid grid-cols-3 gap-2 mb-2">
-                        <div className="text-center">
-                          <div className="text-xs text-yellow-600">최소</div>
-                          <div className="font-semibold">{(product.requirementAnalysis.timeline as any)?.minimum_days || 'N/A'}일</div>
-                        </div>
-                        <div className="text-center">
-                          <div className="text-xs text-yellow-600">일반적</div>
-                          <div className="font-semibold">{(product.requirementAnalysis.timeline as any)?.typical_days || 'N/A'}일</div>
-                        </div>
-                        <div className="text-center">
-                          <div className="text-xs text-yellow-600">최대</div>
-                          <div className="font-semibold">{(product.requirementAnalysis.timeline as any)?.maximum_days || 'N/A'}일</div>
-                        </div>
-                      </div>
-                      {(product.requirementAnalysis.timeline as any)?.critical_path && (
-                        <div className="text-xs text-yellow-600">
-                          주요 경로: {(product.requirementAnalysis.timeline as any).critical_path.join(' → ')}
-                        </div>
-                      )}
-                    </div>
-                  )}
-                </div>
-              )}
 
               {product.requirementAnalysis.criticalDeadline && (
                 <div className="p-3 bg-red-50 border border-red-200 rounded-lg">
@@ -1269,24 +1264,38 @@ const RequirementsAnalysisCard: React.FC<RequirementsAnalysisCardProps> = ({ pro
                       <div>
                         <h5 className="font-semibold text-indigo-900 mb-2">📊 카테고리별 점수</h5>
                         <div className="space-y-2">
-                          {Object.entries(product.requirementAnalysis.complianceScore.category_scores).map(([category, data]: [string, any]) => (
+                          {Object.entries(product.requirementAnalysis.complianceScore.category_scores).map(([category, data]: [string, any]) => {
+                            const categoryNames: { [key: string]: string } = {
+                              'documentation': '문서화',
+                              'testing': '테스트',
+                              'labeling': '라벨링',
+                              'timeline': '타임라인',
+                              'cost_efficiency': '비용 효율성'
+                            };
+                            return (
                             <div key={category} className="p-2 bg-indigo-50 rounded">
                               <div className="flex justify-between items-center mb-1">
-                                <span className="text-sm font-medium text-indigo-900 capitalize">
-                                  {category.replace(/_/g, ' ')}
+                                <span className="text-sm font-medium text-indigo-900">
+                                  {categoryNames[category] || category.replace(/_/g, ' ')}
                                 </span>
                                 <span className="text-sm font-bold text-indigo-700">
                                   {data.score} / {data.max_score}
                                 </span>
                               </div>
-                              <div className="w-full bg-indigo-200 rounded-full h-2">
+                              <div className="w-full bg-indigo-200 rounded-full h-2 mb-1">
                                 <div
                                   className="bg-indigo-500 h-2 rounded-full"
                                   style={{ width: `${(data.score / data.max_score) * 100}%` }}
                                 ></div>
                               </div>
+                              {data.reasoning && (
+                                <div className="text-xs text-indigo-700 mt-1">
+                                  💡 {data.reasoning}
+                                </div>
+                              )}
                             </div>
-                          ))}
+                            );
+                          })}
                         </div>
                       </div>
                     )}
