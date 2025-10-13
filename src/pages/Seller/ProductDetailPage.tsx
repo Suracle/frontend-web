@@ -55,6 +55,10 @@ const ProductDetailPage: React.FC = () => {
   const fetchRequirementAnalysis = async (productId: number) => {
     try {
       setRequirementLoading(true);
+      
+      // 3초 딜레이 (새 상품 등록 시 로딩 효과)
+      await new Promise(resolve => setTimeout(resolve, 3000));
+      
       const analysis = await requirementApi.getRequirementAnalysis(productId);
       setRequirementAnalysis(analysis);
     } catch (error) {

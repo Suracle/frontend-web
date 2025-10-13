@@ -144,8 +144,8 @@ export const productApi = {
       };
       
       console.log("Sending precedents analysis request:", requestData);
-      // Python AI 엔진으로 직접 요청
-      const response = await fetch('http://localhost:8000/analyze-precedents', {
+      // Python AI 엔진으로 직접 요청 (새 엔드포인트)
+      const response = await fetch('http://localhost:8000/precedents/analyze', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
