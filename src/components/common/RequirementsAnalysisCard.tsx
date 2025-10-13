@@ -97,7 +97,10 @@ const RequirementsAnalysisCard: React.FC<RequirementsAnalysisCardProps> = ({ pro
                 >
                   <div className="flex items-center gap-2">
                     <AlertCircle size={16} className="text-red-500" />
-                    <h4 className="font-semibold text-text-primary">핵심 조치사항</h4>
+                    <div className="flex flex-col">
+                      <h4 className="font-semibold text-text-primary">핵심 조치사항</h4>
+                      <p className="text-xs text-gray-500">즉시 수행해야 할 중요한 규제 준수 조치</p>
+                    </div>
                     <span className="px-2 py-0.5 bg-red-200 text-red-800 text-xs rounded-full font-medium">
                       {product.requirementAnalysis.criticalActions?.length ?? 0}
                     </span>
@@ -151,10 +154,13 @@ const RequirementsAnalysisCard: React.FC<RequirementsAnalysisCardProps> = ({ pro
             {/* 브로커 거절 사유 */}
             {product.requirementAnalysis.brokerRejectionReason && (
               <div className="mb-6">
-                <h4 className="font-semibold text-text-primary mb-3 flex items-center gap-2">
-                  <XCircle size={16} className="text-red-500" />
-                  브로커 거절 사유
-                </h4>
+                <div className="mb-3">
+                  <h4 className="font-semibold text-text-primary flex items-center gap-2">
+                    <XCircle size={16} className="text-red-500" />
+                    브로커 거절 사유
+                  </h4>
+                  <p className="text-xs text-gray-500">브로커가 수입을 거절한 구체적인 이유</p>
+                </div>
                 <div className="p-4 bg-red-50 border border-red-200 rounded-lg">
                   <p className="text-sm text-red-800">{product.requirementAnalysis.brokerRejectionReason}</p>
                 </div>
@@ -170,7 +176,10 @@ const RequirementsAnalysisCard: React.FC<RequirementsAnalysisCardProps> = ({ pro
                 >
                   <div className="flex items-center gap-2">
                     <FileText size={16} className="text-blue-500" />
-                    <h4 className="font-semibold text-text-primary">필수 문서 목록</h4>
+                    <div className="flex flex-col">
+                      <h4 className="font-semibold text-text-primary">필수 문서 목록</h4>
+                      <p className="text-xs text-gray-500">수입 시 반드시 제출해야 하는 공식 문서들</p>
+                    </div>
                     <span className="px-2 py-0.5 bg-blue-200 text-blue-800 text-xs rounded-full font-medium">
                       {product.requirementAnalysis.requiredDocuments?.length ?? 0}
                     </span>
@@ -228,7 +237,10 @@ const RequirementsAnalysisCard: React.FC<RequirementsAnalysisCardProps> = ({ pro
                 >
                   <div className="flex items-center gap-2">
                     <CheckCircle size={16} className="text-green-500" />
-                    <h4 className="font-semibold text-text-primary">준수 단계</h4>
+                    <div className="flex flex-col">
+                      <h4 className="font-semibold text-text-primary">준수 단계</h4>
+                      <p className="text-xs text-gray-500">규제 준수를 위한 순차적 실행 단계</p>
+                    </div>
                     <span className="px-2 py-0.5 bg-green-200 text-green-800 text-xs rounded-full font-medium">
                       {product.requirementAnalysis.complianceSteps?.length ?? 0}
                     </span>
@@ -288,7 +300,10 @@ const RequirementsAnalysisCard: React.FC<RequirementsAnalysisCardProps> = ({ pro
                 >
                   <div className="flex items-center gap-2">
                     <TrendingUp size={16} className="text-orange-500" />
-                    <h4 className="font-semibold text-text-primary">위험 요소</h4>
+                    <div className="flex flex-col">
+                      <h4 className="font-semibold text-text-primary">위험 요소</h4>
+                      <p className="text-xs text-gray-500">수입 과정에서 발생할 수 있는 잠재적 위험</p>
+                    </div>
                     <span className="px-2 py-0.5 bg-orange-200 text-orange-800 text-xs rounded-full font-medium">
                       {product.requirementAnalysis.riskFactors?.length ?? 0}
                     </span>
@@ -354,7 +369,10 @@ const RequirementsAnalysisCard: React.FC<RequirementsAnalysisCardProps> = ({ pro
                 >
                   <div className="flex items-center gap-2">
                     <DollarSign size={16} className="text-teal-500" />
-                    <h4 className="font-semibold text-text-primary">예상 비용</h4>
+                    <div className="flex flex-col">
+                      <h4 className="font-semibold text-text-primary">예상 비용</h4>
+                      <p className="text-xs text-gray-500">수입 과정에서 발생할 총 예상 비용 범위</p>
+                    </div>
                     <span className="px-2 py-0.5 bg-teal-200 text-teal-800 text-xs rounded-full font-medium">
                       ${product.requirementAnalysis.estimatedCosts.total.min?.toLocaleString() || 'N/A'} - ${product.requirementAnalysis.estimatedCosts.total.max?.toLocaleString() || 'N/A'}
                     </span>
@@ -481,7 +499,10 @@ const RequirementsAnalysisCard: React.FC<RequirementsAnalysisCardProps> = ({ pro
                 >
                   <div className="flex items-center gap-2">
                     <Lightbulb size={16} className="text-violet-500" />
-                    <h4 className="font-semibold text-text-primary">전문가 권장사항</h4>
+                    <div className="flex flex-col">
+                      <h4 className="font-semibold text-text-primary">전문가 권장사항</h4>
+                      <p className="text-xs text-gray-500">수입 성공을 위한 전문가 조언 및 팁</p>
+                    </div>
                     <span className="px-2 py-0.5 bg-violet-200 text-violet-800 text-xs rounded-full font-medium">
                       {product.requirementAnalysis.recommendations?.length ?? 0}
                     </span>
@@ -547,7 +568,10 @@ const RequirementsAnalysisCard: React.FC<RequirementsAnalysisCardProps> = ({ pro
                 >
                   <div className="flex items-center gap-2">
                     <Clock size={16} className="text-cyan-500" />
-                    <h4 className="font-semibold text-text-primary">상세 타임라인</h4>
+                    <div className="flex flex-col">
+                      <h4 className="font-semibold text-text-primary">상세 타임라인</h4>
+                      <p className="text-xs text-gray-500">수입 과정의 단계별 소요 시간 및 일정</p>
+                    </div>
                     <span className="px-2 py-0.5 bg-cyan-200 text-cyan-800 text-xs rounded-full font-medium">
                       {product.requirementAnalysis.timelineDetail.typical_days}일 소요 예상
                     </span>
@@ -658,7 +682,10 @@ const RequirementsAnalysisCard: React.FC<RequirementsAnalysisCardProps> = ({ pro
                 >
                   <div className="flex items-center gap-2">
                     <FileText size={16} className="text-purple-500" />
-                    <h4 className="font-semibold text-text-primary">라벨링 요구사항</h4>
+                    <div className="flex flex-col">
+                      <h4 className="font-semibold text-text-primary">라벨링 요구사항</h4>
+                      <p className="text-xs text-gray-500">제품 포장에 표시해야 할 필수 라벨 정보</p>
+                    </div>
                     <span className="px-2 py-0.5 bg-purple-200 text-purple-800 text-xs rounded-full font-medium">
                       {product.requirementAnalysis.labelingRequirements?.length ?? 0}
                     </span>
@@ -705,7 +732,10 @@ const RequirementsAnalysisCard: React.FC<RequirementsAnalysisCardProps> = ({ pro
                 >
                   <div className="flex items-center gap-2">
                     <CheckCircle size={16} className="text-indigo-500" />
-                    <h4 className="font-semibold text-text-primary">테스트 요구사항</h4>
+                    <div className="flex flex-col">
+                      <h4 className="font-semibold text-text-primary">테스트 요구사항</h4>
+                      <p className="text-xs text-gray-500">수입 전 수행해야 할 품질 및 안전성 검사</p>
+                    </div>
                     <span className="px-2 py-0.5 bg-indigo-200 text-indigo-800 text-xs rounded-full font-medium">
                       {product.requirementAnalysis.testingRequirements?.length ?? 0}
                     </span>
@@ -757,7 +787,10 @@ const RequirementsAnalysisCard: React.FC<RequirementsAnalysisCardProps> = ({ pro
                 >
                   <div className="flex items-center gap-2">
                     <XCircle size={16} className="text-red-500" />
-                    <h4 className="font-semibold text-text-primary">금지/제한 물질</h4>
+                    <div className="flex flex-col">
+                      <h4 className="font-semibold text-text-primary">금지/제한 물질</h4>
+                      <p className="text-xs text-gray-500">제품에 포함되면 안 되는 금지 성분 목록</p>
+                    </div>
                     <span className="px-2 py-0.5 bg-red-200 text-red-800 text-xs rounded-full font-medium">
                       {product.requirementAnalysis.prohibitedRestrictedSubstances?.length ?? 0}
                     </span>
@@ -809,7 +842,10 @@ const RequirementsAnalysisCard: React.FC<RequirementsAnalysisCardProps> = ({ pro
                 >
                   <div className="flex items-center gap-2">
                     <CheckCircle size={16} className="text-green-500" />
-                    <h4 className="font-semibold text-text-primary">면제 규정 및 특별 조건</h4>
+                    <div className="flex flex-col">
+                      <h4 className="font-semibold text-text-primary">면제 규정 및 특별 조건</h4>
+                      <p className="text-xs text-gray-500">일반 규제에서 제외되는 특수 조건들</p>
+                    </div>
                     <span className="px-2 py-0.5 bg-green-200 text-green-800 text-xs rounded-full font-medium">
                       {product.requirementAnalysis.exemptions?.length ?? 0}
                     </span>
@@ -889,7 +925,10 @@ const RequirementsAnalysisCard: React.FC<RequirementsAnalysisCardProps> = ({ pro
                 >
                   <div className="flex items-center gap-2">
                     <AlertCircle size={16} className="text-orange-500" />
-                    <h4 className="font-semibold text-text-primary">사전 통지 요구사항</h4>
+                    <div className="flex flex-col">
+                      <h4 className="font-semibold text-text-primary">사전 통지 요구사항</h4>
+                      <p className="text-xs text-gray-500">수입 전 관련 기관에 미리 알려야 할 사항</p>
+                    </div>
                     <span className="px-2 py-0.5 bg-orange-200 text-orange-800 text-xs rounded-full font-medium">
                       {product.requirementAnalysis.priorNotifications?.length ?? 0}
                     </span>
@@ -941,7 +980,10 @@ const RequirementsAnalysisCard: React.FC<RequirementsAnalysisCardProps> = ({ pro
                 >
                   <div className="flex items-center gap-2">
                     <CheckCircle size={16} className="text-emerald-500" />
-                    <h4 className="font-semibold text-text-primary">실행 체크리스트</h4>
+                    <div className="flex flex-col">
+                      <h4 className="font-semibold text-text-primary">실행 체크리스트</h4>
+                      <p className="text-xs text-gray-500">수입 전/중/후 단계별 수행할 작업 목록</p>
+                    </div>
                     <span className="px-2 py-0.5 bg-emerald-200 text-emerald-800 text-xs rounded-full font-medium">
                       {(product.requirementAnalysis.executionChecklist.pre_import?.length || 0) +
                        (product.requirementAnalysis.executionChecklist.during_import?.length || 0) +
@@ -1051,7 +1093,10 @@ const RequirementsAnalysisCard: React.FC<RequirementsAnalysisCardProps> = ({ pro
                 >
                   <div className="flex items-center gap-2">
                     <DollarSign size={16} className="text-amber-500" />
-                    <h4 className="font-semibold text-text-primary">상세 비용 분석</h4>
+                    <div className="flex flex-col">
+                      <h4 className="font-semibold text-text-primary">상세 비용 분석</h4>
+                      <p className="text-xs text-gray-500">필수/선택/숨겨진 비용의 세부 분석</p>
+                    </div>
                   </div>
                   {expandedSections.has('costBreakdown') ? (
                     <ChevronUp size={20} className="text-gray-600" />
@@ -1158,7 +1203,10 @@ const RequirementsAnalysisCard: React.FC<RequirementsAnalysisCardProps> = ({ pro
                 >
                   <div className="flex items-center gap-2">
                     <AlertCircle size={16} className="text-rose-500" />
-                    <h4 className="font-semibold text-text-primary">리스크 매트릭스</h4>
+                    <div className="flex flex-col">
+                      <h4 className="font-semibold text-text-primary">리스크 매트릭스</h4>
+                      <p className="text-xs text-gray-500">위험도별 분류된 리스크 요소와 대응 방안</p>
+                    </div>
                     <span className="px-2 py-0.5 bg-rose-200 text-rose-800 text-xs rounded-full font-medium">
                       {(product.requirementAnalysis.riskMatrix.high_risk?.length || 0) +
                        (product.requirementAnalysis.riskMatrix.medium_risk?.length || 0)}개
@@ -1236,7 +1284,10 @@ const RequirementsAnalysisCard: React.FC<RequirementsAnalysisCardProps> = ({ pro
                 >
                   <div className="flex items-center gap-2">
                     <TrendingUp size={16} className="text-indigo-500" />
-                    <h4 className="font-semibold text-text-primary">준수 점수</h4>
+                    <div className="flex flex-col">
+                      <h4 className="font-semibold text-text-primary">요건 강도</h4>
+                      <p className="text-xs text-gray-500">요건 준비 복잡도 점수 및 카테고리별 분석</p>
+                    </div>
                     <span className="px-2 py-0.5 bg-indigo-200 text-indigo-800 text-xs rounded-full font-medium">
                       {product.requirementAnalysis.complianceScore.overall_score}점
                     </span>
@@ -1346,7 +1397,10 @@ const RequirementsAnalysisCard: React.FC<RequirementsAnalysisCardProps> = ({ pro
                 >
                   <div className="flex items-center gap-2">
                     <CheckCircle size={16} className="text-sky-500" />
-                    <h4 className="font-semibold text-text-primary">시장 접근 요구사항</h4>
+                    <div className="flex flex-col">
+                      <h4 className="font-semibold text-text-primary">시장 접근 요구사항</h4>
+                      <p className="text-xs text-gray-500">소매업체별 및 주별 특수 규제 요구사항</p>
+                    </div>
                     <span className="px-2 py-0.5 bg-sky-200 text-sky-800 text-xs rounded-full font-medium">
                       {(product.requirementAnalysis.marketAccess.retailer_requirements?.length || 0) +
                        (product.requirementAnalysis.marketAccess.state_regulations?.length || 0)}개
