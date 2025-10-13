@@ -448,6 +448,19 @@ export interface MarketAccess {
   }>;
 }
 
+// 개선 영역
+export interface ImprovementArea {
+  area: string;
+  area_ko?: string;
+  priority: 'high' | 'medium' | 'low';
+  source_url?: string;
+  action_plan: string;
+  current_gap: string;
+  action_plan_ko?: string;
+  current_gap_ko?: string;
+  estimated_effort: string;
+}
+
 export interface RequirementAnalysisResponse {
   productId: string;
   productName: string;
@@ -487,6 +500,17 @@ export interface RequirementAnalysisResponse {
   riskMatrix?: RiskMatrix;
   complianceScore?: ComplianceScore;
   marketAccess?: MarketAccess;
+  
+  // LLM 요약 객체 (AI 엔진에서 제공하는 모든 확장 필드 포함)
+  llm_summary?: {
+    market_access?: MarketAccess;
+    cost_breakdown?: CostBreakdown;
+    risk_matrix?: RiskMatrix;
+    execution_checklist?: ExecutionChecklist;
+    improvement_areas?: ImprovementArea[];
+    // 기타 LLM 요약 필드들
+    [key: string]: any;
+  };
   
   // 기존 타임라인 (하위 호환성)
   timeline?: string;
